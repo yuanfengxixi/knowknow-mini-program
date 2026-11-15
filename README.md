@@ -29,6 +29,8 @@
 7. 在仓库根目录运行 `node scripts/sync-cloudfunction-shared.cjs`，将共享云函数模块复制到各函数目录；随后使用微信开发者工具打开仓库并部署 `miniprogram/cloudfunctions/` 下的云函数。
 8. 确认云端集合、索引与访问规则符合你的隔离要求，再用 `cd tests && npm ci && npm test` 运行本地 Node 测试。
 
+GitHub Actions 会在 Node.js 20 和 22 下运行这组测试，并检查小程序 JavaScript 语法与 JSON 配置。
+
 本仓库不提供可直接使用的 AppID、CloudBase 环境、模型密钥或支付凭据；也不代表这些能力已在你的账号或生产环境验证。
 
 ## CloudBase 云函数环境变量

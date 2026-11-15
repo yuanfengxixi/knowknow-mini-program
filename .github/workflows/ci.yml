@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      - run: npm ci --prefix tests
+      - run: npm test --prefix tests
+      - name: Check JavaScript syntax
+        run: find miniprogram -type f -name '*.js' -print0 | xargs -0 -n 1 node --check
+      - name: Parse project JSON
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          function visit(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const file = path.join(dir, entry.name);
+              if (entry.isDirectory()) visit(file);
+              else if (entry.isFile() && file.endsWith('.json')) {
+                JSON.parse(fs.readFileSync(file, 'utf8'));
+              }
+            }
+          }
+          JSON.parse(fs.readFileSync('project.config.json', 'utf8'));
+          visit('miniprogram');
+          NODE
