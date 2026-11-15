@@ -1,0 +1,8 @@
+{
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "top-nav": "/components/top-nav/top-nav",
+    "loading-mask": "/components/loading-mask/loading-mask"
+  }
+}

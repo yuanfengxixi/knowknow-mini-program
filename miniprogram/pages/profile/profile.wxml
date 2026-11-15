@@ -1,0 +1,26 @@
+<loading-mask show="{{booting}}" bg="#FFFFFF"/>
+<view class="profile-page">
+  <view class="profile-header">
+    <view class="profile-desc">只保留长期有用的背景和偏好，你可随时修改或删除。</view>
+  </view>
+  <view wx:if="{{error}}" class="profile-error" bindtap="loadMemory">{{error}}</view>
+  <block wx:else>
+    <view wx:if="{{!cards.length && !adding}}" class="profile-empty">还没有长期记忆。</view>
+    <view class="memory-card" wx:for="{{cards}}" wx:key="_id">
+      <textarea class="memory-editor" value="{{item.draft}}" data-index="{{index}}" bindinput="onCardInput" maxlength="1000" auto-height show-confirm-bar="{{false}}"/>
+      <view class="memory-actions">
+        <button class="text-action danger" data-index="{{index}}" bindtap="removeCard">删除</button>
+        <button wx:if="{{item.draft !== item.content}}" class="text-action primary" data-index="{{index}}" loading="{{savingId===item._id}}" bindtap="saveCard">保存修改</button>
+      </view>
+    </view>
+    <view wx:if="{{adding}}" class="memory-card new-card">
+      <view class="new-card-title">添加长期记忆</view>
+      <textarea class="memory-editor new-editor" value="{{newContent}}" bindinput="onNewInput" maxlength="1000" auto-height focus placeholder="例如：我做产品经理，喜欢先看结论。" show-confirm-bar="{{false}}"/>
+      <view class="new-card-tip">请勿填写身份证、银行卡等敏感信息</view>
+      <view class="memory-actions"><button class="text-action" bindtap="cancelAdd">取消</button><button class="text-action primary" loading="{{savingId==='new'}}" bindtap="addCard">添加</button></view>
+    </view>
+    <button wx:if="{{!adding && !atLimit}}" class="profile-add" bindtap="showAdd">+  添加长期记忆</button>
+    <view wx:if="{{atLimit}}" class="profile-limit">已达 {{maxCards}} 条上限，请合并、更新或删除旧内容。</view>
+    <button wx:if="{{lastChangeId}}" class="profile-undo" loading="{{savingId==='undo'}}" bindtap="undo">撤销上一次修改</button>
+  </block>
+</view>

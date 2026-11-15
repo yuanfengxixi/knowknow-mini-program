@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "loading-mask": "/components/loading-mask/loading-mask",
+    "voice-input": "/components/voice-input/voice-input",
+    "operation-toast": "/components/operation-toast/operation-toast"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "navigationBarBackgroundColor": "#F3F3F0",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "top-nav": "/components/top-nav/top-nav",
+    "loading-mask": "/components/loading-mask/loading-mask",
+    "zhizhi": "/components/zhizhi/zhizhi",
+    "voice-input": "/components/voice-input/voice-input",
+    "operation-toast": "/components/operation-toast/operation-toast"
+  }
+}

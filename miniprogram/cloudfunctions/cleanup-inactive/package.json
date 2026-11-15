@@ -1,0 +1,9 @@
+{
+  "name": "cleanup-inactive",
+  "version": "0.1.0",
+  "description": "say - 长期不活跃用户存储管理（定时）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

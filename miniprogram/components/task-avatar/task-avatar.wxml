@@ -1,0 +1,5 @@
+<view class="task-character task-{{status}}">
+  <zhizhi mode="static" size="66" variant="{{variant}}"/>
+  <view wx:if="{{pending && animate}}" class="task-prop"><view class="task-paper"/></view>
+  <text wx:elif="{{status === 'done'}}" class="task-complete">✓</text>
+</view>

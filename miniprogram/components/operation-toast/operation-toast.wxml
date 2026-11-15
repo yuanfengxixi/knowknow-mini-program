@@ -1,0 +1,4 @@
+<view wx:if="{{rendered}}" class="operation-toast" aria-live="polite">
+  <view class="operation-toast-spinner" aria-hidden="true"></view>
+  <text>{{text}}</text>
+</view>

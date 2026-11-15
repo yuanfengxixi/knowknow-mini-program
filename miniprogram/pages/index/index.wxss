@@ -1,0 +1,139 @@
+@import "messages.wxss";
+@import "attachments.wxss";
+.trial-reminder { display:flex; justify-content:space-between; align-items:center; margin:0 8rpx 12rpx; color:#59665e; font-size:23rpx; }
+.trial-open { color:var(--brand); font-weight:600; }
+.trial-dismiss { color:#7b8b80; font-size:34rpx; line-height:1; padding:0 8rpx; }
+/* --- 笔记卡片 --- */
+.hit-list {
+  margin-top: 16rpx;
+  border-top: 1rpx solid #e8e8e8;
+  padding-top: 8rpx;
+}
+.hit {
+  padding: 16rpx 10rpx;
+  font-size: 26rpx;
+  color: #000000;
+  border-bottom: 1rpx solid #f0f0f0;
+  border-radius: 10rpx;
+  transition: background 0.15s ease;
+}
+.hit:active {
+  background: #ECECEC;
+}
+.hit:last-child { border-bottom: none; }
+.hit-new-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #fff;
+  background: #07C160;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+  margin-left: 12rpx;
+}
+.hit-merged {
+  background: #e8faf1;
+  border-left: 6rpx solid #07C160;
+  padding-left: 20rpx;
+}
+.hit-merged-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #07C160;
+  background: #c8f0d9;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+  margin-left: 12rpx;
+}
+
+/* --- 底部留白 --- */
+.chat-pad { height: 24rpx; }
+
+/* === 待发图片预览 === */
+.pending-img {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 14rpx 28rpx;
+  background: #fafafa;
+  border-top: 1rpx solid #e8e8e8;
+}
+.pi-thumb { width: 72rpx; height: 72rpx; border-radius: 12rpx; }
+.pi-tip { flex: 1; font-size: 24rpx; color: #999999; }
+.pi-del { font-size: 30rpx; color: #999999; padding: 0 10rpx; }
+
+.pending-file {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 14rpx 28rpx;
+  background: #fafafa;
+  border-top: 1rpx solid #e8e8e8;
+}
+.pf-icon { width: 56rpx; height: 56rpx; flex-shrink: 0; }
+.pf-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4rpx; }
+.pf-name { font-size: 25rpx; color: #222222; overflow-wrap: anywhere; }
+.pf-size { font-size: 22rpx; color: #888888; }
+.pf-del { font-size: 30rpx; color: #999999; padding: 0 10rpx; }
+
+/* === 底部输入区（悬浮卡片） === */
+.input-float-wrap {
+  flex-shrink: 0;
+  /* 底部只取三分之一安全区（2026-08-24 老板反馈"输入框有点靠上"）：
+     安全区那 34px 是给可点击元素让位的，而下面那行「回复由 AI 生成」是纯展示文字，
+     压进安全区不挡任何操作；全额留的话输入框连同标识一起浮在半空，离底太远。
+     20rpx 是保底——非刘海机型 env() 返回 0，没有它文字会贴死屏幕边框 */
+  padding: 16rpx 20rpx calc(20rpx + env(safe-area-inset-bottom) * 0.35);
+  background: transparent;
+}
+.input-float-wrap.menu-open {
+  padding-bottom: 12rpx;
+}
+/* 生成内容标识：无边框无底色，只有一行弱灰字。
+   色号与 .msg-time 同一档（#999），保持全页小字体系统一 */
+.ai-tip {
+  display: block;
+  padding-top: 14rpx;
+  text-align: center;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: #999999;
+}
+.composer-row { display:flex; align-items:center; gap:12rpx; }
+.composer-input { flex:1; width:0; min-width:0; }
+.new-chat-pill { flex:none; min-width:56rpx; height:62rpx; padding:0 18rpx; box-sizing:border-box; display:flex; align-items:center; justify-content:center; border:2rpx solid #d8dedb; border-radius:36rpx; color:#78827d; background:#f6f7f6; font-size:25rpx; }
+.new-chat-pill.active { border-color:#07C160; color:#078f49; background:#e5f8ed; }
+.task-trace { margin:2rpx 0 10rpx; padding-left:24rpx; color:#8a8f8c; font-size:22rpx; }
+.task-trace-summary { display:flex; align-items:center; gap:10rpx; min-height:34rpx; }
+.task-trace-chevron { color:#a2a7a4; }
+.task-trace-list { margin-top:6rpx; padding-left:16rpx; border-left:2rpx solid #e5e8e6; }
+.task-trace-item { padding:4rpx 0; line-height:1.5; }
+.trace-state { display:inline-block; width:76rpx; color:#9a9e9c; }
+.trace-state.failed { color:#c45656; }
+.trace-state.interrupted { color:#ae8743; }
+@media (prefers-reduced-motion: reduce) {
+  .msg-row,
+  .rec-wm,
+  .archive-running-dot,
+  .archive-step.current .archive-step-icon,
+  .typing-peek,
+  .kb-line,
+  .kb-leaf {
+    animation: none;
+  }
+  .archive-chevron { transition: none; }
+}
+
+/* 查询阶段使用真实回执文字；静态降级不依赖动画，按钮有真实恢复/重试处理。 */
+.query-task-status { margin-top: 12rpx; color: #777; font-size: 24rpx; line-height: 1.6; }
+.query-task-retry { display: inline-block; margin: 12rpx 0 0; padding: 0 20rpx; color: var(--brand); font-size: 24rpx; background: transparent; }
+.query-task-retry::after { border-color: currentColor; }
+
+/* 提示随输入区域布局，不遮住聊天、附件或系统键盘。 */
+.credit-notice { display: flex; align-items: flex-start; margin: 0 4rpx 16rpx; padding: 22rpx 24rpx; background: #ffffff; border: 1rpx solid #e7e9e8; border-radius: 24rpx; box-shadow: 0 4rpx 20rpx rgba(0,0,0,.04); }
+.credit-notice-copy { flex: 1; min-width: 0; }
+.credit-notice-title { display: block; color: #222222; font-size: 27rpx; font-weight: 600; }
+.credit-notice-detail { display: block; margin-top: 8rpx; color: #777777; font-size: 24rpx; line-height: 1.5; }
+.credit-notice-link { display: block; margin-top: 14rpx; color: var(--brand); font-size: 25rpx; }
+.credit-notice-close { padding: 0 8rpx 16rpx 20rpx; font-size: 36rpx; line-height: 1; color: #888888; }

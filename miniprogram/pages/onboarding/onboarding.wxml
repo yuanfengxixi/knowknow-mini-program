@@ -1,0 +1,88 @@
+<view class="onboarding">
+  <swiper wx:if="{{step === 'cards'}}" class="tutorial-swiper" current="{{cardIndex}}" duration="280" bindchange="onCardChange">
+    <swiper-item wx:for="{{cards}}" wx:key="num">
+      <view class="tutorial-scroll">
+        <view class="paper-card tutorial-card tone-{{index}}">
+          <view class="card-number">{{item.num}}<text class="number-rays">⌁</text></view>
+          <view class="card-title">{{item.title}}</view>
+          <view class="card-desc">{{item.desc}}</view>
+          <view class="art-window">
+            <image wx:if="{{index === 0}}" class="card-art" src="/images/onboarding/01.jpg" mode="widthFix" />
+            <image wx:elif="{{index === 1}}" class="card-art" src="/images/onboarding/02.jpg" mode="widthFix" />
+            <image wx:elif="{{index === 2}}" class="card-art" src="/images/onboarding/03.jpg" mode="widthFix" />
+            <image wx:elif="{{index === 3}}" class="card-art" src="/images/onboarding/04.jpg" mode="widthFix" />
+            <image wx:else class="card-art" src="/images/onboarding/05.jpg" mode="widthFix" />
+          </view>
+          <view wx:if="{{item.foot}}" class="card-foot"><view class="line-icon icon-{{item.icon}}"></view><text>{{item.foot}}</text></view>
+          <view wx:if="{{index === lastCard}}" class="last-actions">
+            <button class="button primary" disabled="{{!privacyAgreed}}" bindtap="next">开始记录 <text>→</text></button>
+            <button class="button secondary create-entry" disabled="{{!privacyAgreed}}" bindtap="openBuilder">创建自己的笔记目录</button>
+          </view>
+          <view wx:if="{{index === lastCard}}" class="privacy-check tutorial-privacy" bindtap="togglePrivacy" role="checkbox" aria-checked="{{privacyAgreed}}"><text class="checkbox {{privacyAgreed ? 'checked' : ''}}">{{privacyAgreed ? '✓' : ''}}</text><view>我已阅读并同意<text class="legal-link" catchtap="openPrivacy">《隐私政策》</text>和<text class="legal-link" catchtap="openAgreement">《用户协议》</text></view></view>
+          <view wx:if="{{index === lastCard && errorText}}" class="error-text tutorial-error">{{errorText}}</view>
+          <view class="dots"><view wx:for="{{cards}}" wx:for-item="dot" wx:for-index="dotIndex" wx:key="num" class="dot {{dotIndex === index ? 'active' : ''}}"></view></view>
+          <view class="card-navigation" wx:if="{{index < lastCard}}">
+            <button class="text-button" wx:if="{{index > 0}}" bindtap="previousCard">← 上一张</button>
+            <text wx:else class="swipe-hint">左右滑动查看</text>
+            <button class="text-button next-card" bindtap="nextCard">下一张 →</button>
+          </view>
+          <view class="card-navigation" wx:else><button class="text-button" bindtap="previousCard">← 上一张</button></view>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view wx:elif="{{step === 'intro'}}" class="paper-card flow-card intro-card">
+    <view class="card-top"><button class="text-button" bindtap="backToCards">← 返回教程</button><text>你的笔记</text></view>
+    <image class="intro-art" src="/images/onboarding/03.jpg" mode="aspectFit" />
+    <view class="card-title">先别急着建目录</view>
+    <view class="card-desc">我们想先认识一下你。\n回答几个有点特别的问题，看看你的知识更适合怎样被整理。</view>
+    <view class="flow-bottom"><button class="button primary start-quiz" bindtap="startQuiz">开始测试 →</button><view class="small-note">约 2 分钟 · 没有标准答案 · 凭第一反应就好</view></view>
+  </view>
+
+  <view wx:elif="{{step === 'quiz'}}" class="paper-card flow-card quiz-card">
+    <view class="card-top"><button class="text-button" bindtap="previousQuestion">← 上一步</button><text>{{questionIndex + 1}} / {{questionCount}}</text></view>
+    <view class="question-symbol">{{question.o}}</view>
+    <view class="question-title">{{question.q}}</view><view class="question-sub">{{question.s}}</view>
+    <view class="answer-list">
+      <button wx:for="{{question.a}}" wx:key="0" class="answer {{selected === index ? 'selected' : ''}}" data-index="{{index}}" bindtap="selectAnswer"><text class="answer-letter">{{item[0]}}</text><text class="answer-copy">{{item[1]}}</text><text class="answer-tick" wx:if="{{selected === index}}">✓</text></button>
+    </view>
+    <view class="flow-bottom"><view class="quiz-progress"><view wx:for="{{questions}}" wx:key="q" class="progress-part {{index <= questionIndex ? 'filled' : ''}}"></view></view><view class="small-note answer-hint">选择后自动进入下一题</view></view>
+  </view>
+
+  <view wx:elif="{{step === 'result'}}" class="paper-card flow-card result-card">
+    <view class="card-top"><button class="text-button" bindtap="backToCards">← 返回教程</button><text>适合你的整理方式</text></view>
+    <view class="type-symbol">{{result.icon}}</view><view class="card-title type-title">{{result.name}}</view><view class="tagline">{{result.tag}}</view>
+    <view class="inset-card personality-card"><view>{{result.desc}}</view><view class="tags"><text class="tag" wx:for="{{result.tags}}" wx:key="*this">{{item}}</text></view></view>
+    <view class="section-title">从这样的笔记目录开始</view>
+    <view class="inset-card tree-card"><view wx:for="{{draft}}" wx:for-item="folder" wx:key="id" class="tree-group"><view class="tree-root"><view class="folder-icon"></view><text>{{folder.name}}</text></view><view class="tree-child" wx:for="{{folder.children}}" wx:key="id"><view class="folder-icon small-folder"></view><text>{{item.name}}</text></view></view></view>
+    <view class="why-card"><text class="why-title">为什么这样设计？</text><text>{{result.why}}</text></view>
+    <view class="small-note">按你的选择推荐，之后可以随时调整。\n长期背景与偏好可在个人中心查看和管理。</view>
+    <view class="result-actions"><button class="button secondary" bindtap="startQuiz">重新测试</button><button class="button secondary edit-structure" bindtap="editStructure">调整结构</button></view>
+    <view wx:if="{{errorText}}" class="error-text">{{errorText}}</view>
+    <button class="button primary create-knowledge" disabled="{{submitting}}" bindtap="createKnowledgeBase">创建我的笔记目录 →</button>
+  </view>
+
+  <view wx:elif="{{step === 'edit'}}" class="paper-card flow-card edit-card">
+    <view class="card-top"><button class="text-button" bindtap="cancelEdit">← 取消调整</button><text>调整结构</text></view>
+    <view class="card-title">再给它一点你的样子</view><view class="card-desc">改个名字，增减文件夹。\n用你最熟悉的方式整理。</view>
+    <view class="edit-group" wx:for="{{editDraft}}" wx:for-item="folder" wx:for-index="rootIndex" wx:key="id">
+      <view class="edit-row"><view class="folder-icon"></view><input class="folder-input" value="{{folder.name}}" placeholder="文件夹名称" maxlength="40" data-root="{{rootIndex}}" bindinput="renameFolder" /><button class="delete-folder" data-root="{{rootIndex}}" bindtap="removeFolder" aria-label="删除文件夹及子文件夹">×</button></view>
+      <view class="edit-row child-edit" wx:for="{{folder.children}}" wx:for-index="childIndex" wx:key="id"><view class="folder-icon small-folder"></view><input class="folder-input" value="{{item.name}}" placeholder="子文件夹名称" maxlength="40" data-root="{{rootIndex}}" data-child="{{childIndex}}" bindinput="renameFolder" /><button class="delete-folder" data-root="{{rootIndex}}" data-child="{{childIndex}}" bindtap="removeFolder" aria-label="删除子文件夹">×</button></view>
+      <button class="text-button add-child" data-root="{{rootIndex}}" bindtap="addFolder">＋ 添加子文件夹</button>
+    </view>
+    <button class="button secondary add-root" bindtap="addFolder">＋ 添加文件夹</button>
+    <view wx:if="{{errorText}}" class="error-text">{{errorText}}</view>
+    <view class="flow-bottom"><button class="button primary save-structure" bindtap="saveEdit">确认调整 →</button><view class="small-note">确认后返回预览，点击创建才会写入笔记目录。</view></view>
+  </view>
+
+  <view wx:elif="{{step === 'profile'}}" class="paper-card flow-card profile-card">
+    <view class="card-top"><button class="text-button" bindtap="backToCards">← 返回教程</button><text>准备开始</text></view>
+    <image class="intro-art profile-art" src="/images/onboarding/05.jpg" mode="aspectFit" />
+    <view class="card-title">一句话，介绍下你自己</view><view class="card-desc">在做什么、想提升什么都行。\n知知会保存对以后有用的稳定背景，你可以在「AI 了解的我」中修改、删除或撤销。</view>
+    <textarea class="profile-input" placeholder="例：在准备教师编考试，想提高效率、坚持复盘" value="{{profile}}" bindinput="onProfile" maxlength="200" />
+    <view class="small-note">可跳过，请勿填写身份证、银行卡等敏感信息。</view>
+    <view class="flow-bottom"><view wx:if="{{errorText}}" class="error-text">{{errorText}}</view><button class="button primary" disabled="{{submitting}}" bindtap="finish">完成，开始记录 →</button><button class="text-button skip-profile" disabled="{{submitting}}" bindtap="skip">先跳过介绍</button></view>
+  </view>
+</view>
+<loading-mask wx:if="{{busyText}}" show="{{true}}" label="{{busyText}}" bg="rgba(243,248,250,0.94)" />

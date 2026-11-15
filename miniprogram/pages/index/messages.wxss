@@ -1,0 +1,249 @@
+/* 聊天页 v3 — Coze 像素级复刻 */
+
+/* === 全局 === */
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F5F5F5;
+  overflow: hidden;
+}
+
+/* === 聊天流 === */
+.chat {
+  flex: 1;
+  min-height: 0;
+  padding: 20rpx 28rpx 0;
+  box-sizing: border-box;
+}
+
+/* --- 消息行 --- */
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+  animation: msgSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* 用户消息保留右侧对齐与现有最大宽度；AI 消息独立使用左上头像布局。 */
+.msg-row.user {
+  justify-content: flex-end;
+  padding-left: 78rpx;
+  padding-right: 40rpx;
+}
+/* AI 靠左：右侧只留窄边距，回复接近满宽（原 80rpx 留白显得空荡）。flex:1 让短回复也铺满 */
+.msg-row.ai {
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: stretch;
+  padding-right: 40rpx;
+}
+.msg-row.ai .msg-body {
+  flex: 1;
+}
+@keyframes msgSlideUp {
+  from { opacity: 0; transform: translateY(16rpx); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 消息体 --- */
+/* min-width:0 是保命的：没有它 flex 项按 min-content 兜底，长单词/长串会把气泡撑破行宽 */
+.msg-body {
+  min-width: 0;
+}
+
+/* --- AI 头像：无底色的知知原图，点击整块都可切换 Agent 模式 --- */
+.msg-avatar {
+  position: relative;
+  flex: none;
+  width: 66rpx;
+  height: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 12rpx;
+  margin-top: 0; /* 头像位于气泡左上方，共用左边界。 */
+}
+.msg-avatar.picker-open { z-index: 22; }
+.msg-avatar-img {
+  width: 66rpx;
+  height: 50rpx; /* 66 × 508/670，保持原图比例 */
+}
+
+/* 模式选择器：两项横向并列，当前模式用绿色底与实心圆双重标识。 */
+.mode-picker-backdrop { position: fixed; inset: 0; z-index: 20; background: transparent; }
+.mode-picker {
+  position: absolute;
+  left: 78rpx;
+  top: -24rpx;
+  display: flex;
+  gap: 8rpx;
+  width: 540rpx;
+  padding: 10rpx;
+  border: 1rpx solid #e7e7e7;
+  border-radius: 22rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 36rpx rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+.mode-option { flex: 1; display: flex; align-items: center; gap: 12rpx; min-width: 0; min-height: 104rpx; padding: 12rpx 14rpx; border-radius: 16rpx; box-sizing: border-box; }
+.mode-option.active { background: var(--brand-weak, #e8faf1); }
+.mode-option-icon { width: 34rpx; text-align: center; font-size: 28rpx; line-height: 1; color: #151515; }
+.mode-option-icon.record { color: var(--brand, #07c160); font-size: 20rpx; }
+.mode-option-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5rpx; }
+.mode-option-title { font-size: 28rpx; line-height: 1.25; font-weight: 600; color: #161616; }
+.mode-option-desc { font-size: 22rpx; line-height: 1.25; color: #999999; }
+.mode-option-radio { width: 24rpx; height: 24rpx; padding: 4rpx; border: 2rpx solid #c9c9c9; border-radius: 50%; box-sizing: border-box; }
+.mode-option.active .mode-option-radio { border-color: var(--brand, #07c160); }
+.mode-option-radio view { width: 100%; height: 100%; border-radius: 50%; background: var(--brand, #07c160); }
+
+/* --- 时间 --- */
+.msg-time {
+  font-size: 22rpx;
+  color: #999999;
+  padding: 0 0 10rpx 4rpx;
+  line-height: 1;
+}
+/* 时间标签不许参与用户气泡定宽：它是气泡的块级兄弟，会一起抬高 .msg-body 的内容宽，
+   而「昨天 14:32」≈100rpx 比单字气泡的 76rpx 还宽——不归零的话「一个字不拉长」就是假的。
+   归零后文字照常向右溢出显示（右边本来就是空白区），nowrap 防零宽下逐字换行撑爆行高 */
+.msg-row.user .msg-time {
+  width: 0;
+  white-space: nowrap;
+}
+
+/* --- 引用条（在气泡内部顶端，浅灰内衬条，不再是独立方框） --- */
+.msg-quote {
+  background: #F4F4F4;
+  border-radius: 10rpx;
+  padding: 10rpx 16rpx;
+  margin-bottom: 12rpx;
+  display: flex;
+  align-items: flex-start;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+.q-line {
+  color: #cccccc;
+  margin-right: 10rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.q-name {
+  color: #666666;
+  flex-shrink: 0;
+  margin-right: 6rpx;
+}
+.q-text {
+  color: #999999;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* --- 气泡 --- */
+.msg-bubble {
+  padding: 18rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: #000000;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.06);
+}
+
+.msg-bubble-text {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.processing-line { display: flex; align-items: center; }
+.processing-dots { display: flex; align-items: center; margin-left: 8rpx; }
+.processing-dots view { width: 6rpx; height: 6rpx; border-radius: 50%; background: var(--brand, #07C160); animation: processing-dot 1s ease-in-out infinite; }
+.processing-dots view:nth-child(2), .processing-dots view:nth-child(3) { margin-left: 5rpx; }
+.processing-dots view:nth-child(2) { animation-delay: 0.15s; }
+.processing-dots view:nth-child(3) { animation-delay: 0.3s; }
+@keyframes processing-dot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6rpx); } }
+@media (prefers-reduced-motion: reduce) { .processing-dots view { animation: none; } }
+
+/* 折叠态：夹到 5 行，剩下的等点"展开全部" */
+.msg-bubble-text.text-folded {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* === AI 回复结构化排版（markdown.parseBlocks）=== */
+.msg-blocks { display: block; }
+/* 超长回复默认折叠：截断 + 底部白色渐隐（AI 气泡是白底） */
+.msg-blocks.mb-folded {
+  max-height: 640rpx;
+  overflow: hidden;
+  position: relative;
+}
+.msg-blocks.mb-folded::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80rpx;
+  background: linear-gradient(rgba(255, 255, 255, 0), #FFFFFF);
+}
+/* 小节标题：加粗略大，上方大间距（和上一节分离）、下方小间距（贴自己内容） */
+.mb-heading {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #111111;
+  margin: 28rpx 0 10rpx;
+}
+.msg-blocks .mb-heading:first-child { margin-top: 4rpx; }
+/* 列表项：浅灰圆点 + 悬挂缩进，换行后文字对齐文字 */
+.mb-bullet {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10rpx;
+}
+.mb-marker {
+  flex-shrink: 0;
+  width: 36rpx;
+  color: #b0b0b3;
+}
+.mb-bullet-text {
+  flex: 1;
+  min-width: 0;
+}
+.mb-para {
+  display: block;
+  margin-bottom: 16rpx;
+}
+.msg-blocks .mb-para:last-child,
+.msg-blocks .mb-bullet:last-child { margin-bottom: 0; }
+.mb-b { font-weight: 600; }
+.mb-fold-btn {
+  margin-top: 12rpx;
+  color: var(--brand);
+  font-size: 26rpx;
+}
+
+/* 用户气泡：浅绿底 */
+.msg-bubble.user {
+  background: #E5F2E5;
+}
+/* 浅绿底上 --brand 太浅，展开/收起按钮换深一档的绿 */
+.msg-bubble.user .mb-fold-btn {
+  color: var(--brand-deep, #06ad56);
+}
+
+/* AI 气泡：白底 + 细边框，和页面灰底分明（原灰白同色导致"没有气泡"的观感） */
+.msg-bubble.ai {
+  background: #FFFFFF;
+  border: 1rpx solid #E8E8E8;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.04);
+}
+
+/* --- 等待回复：知知开门翻知识库 --- */

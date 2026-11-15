@@ -1,0 +1,40 @@
+<view class="voice-bar">
+  <view wx:if="{{voiceMode}}" class="hold-button" catchtouchstart="touchStart" catchtouchmove="touchMove" catchtouchend="touchEnd" catchtouchcancel="touchCancel" aria-role="button" aria-label="按住说话">按住 说话</view>
+  <textarea wx:else class="typed-input" value="{{value}}" placeholder="{{placeholder}}" bindinput="input" bindfocus="focus" auto-height maxlength="-1" show-confirm-bar="{{false}}" cursor-spacing="20" adjust-position/>
+  <view class="mode-button" catchtap="toggleMode" aria-role="button" aria-label="{{voiceMode ? '切换文字输入' : '切换语音输入'}}">
+    <image src="/icons/{{voiceMode ? 'keyboard' : 'mic-gray'}}.svg"/>
+  </view>
+  <view wx:if="{{!voiceMode && (value || hasAttachment)}}" class="send-button" catchtap="send">发送</view>
+  <view wx:elif="{{!voiceMode && attachment}}" class="mode-button attach-button {{attachmentOpen ? 'attach-open' : ''}}" catchtap="attach" aria-role="button" aria-label="{{attachmentOpen ? '收起附件菜单' : '添加图片或文档'}}"><image src="/icons/plus.svg"/></view>
+</view>
+<view wx:if="{{phase !== 'idle'}}" class="voice-overlay {{phase === 'cancel' ? 'is-cancel' : ''}}" catchtouchmove="touchMove">
+  <view wx:if="{{phase === 'holding' || phase === 'cancel' || phase === 'locked'}}" class="top-target {{phase === 'locked' ? 'is-locked' : ''}}" style="top:{{top}}px; height:{{topHeight}}px;">
+    <button wx:if="{{phase === 'locked'}}" class="finish-button" catchtap="finish">完成录音</button>
+    <text wx:else>上滑至此，持续录音</text>
+  </view>
+  <view class="voice-center">
+    <view class="speech-bubble {{phase === 'cancel' ? 'cancel-bubble' : ''}}">
+      <block wx:if="{{phase === 'review'}}">
+        <textarea wx:if="{{editing}}" class="review-input" value="{{inputValue}}" bindinput="editText" focus auto-height maxlength="-1" show-confirm-bar="{{false}}" adjust-position/>
+        <scroll-view wx:else scroll-y class="review-scroll" catchtap="edit"><text>{{inputValue || error || '未识别出文字，点击输入或取消重录'}}</text></scroll-view>
+      </block>
+      <text wx:elif="{{phase === 'finishing'}}">正在转写…</text>
+      <block wx:else>
+        <text wx:if="{{phase !== 'cancel'}}" class="live-text">{{inputValue || '正在聆听…'}}</text>
+        <view class="waves"><view wx:for="{{waves}}" wx:key="*this" class="wave" style="animation-delay:{{item * 0.09}}s"/></view>
+      </block>
+    </view>
+    <text wx:if="{{phase === 'review'}}" class="center-hint">{{error || '轻触文字区域可编辑'}}</text>
+    <text wx:elif="{{phase === 'cancel'}}" class="center-hint">松开 取消</text>
+    <text wx:elif="{{phase === 'locked'}}" class="center-hint">持续录音中 · {{elapsed}}秒</text>
+  </view>
+  <view wx:if="{{phase === 'review'}}" class="review-actions">
+    <button class="cancel-button" catchtap="cancel">↶ 取消</button>
+    <button class="confirm-button" disabled="{{!inputValue}}" catchtap="confirm" aria-label="确认发送">✓</button>
+  </view>
+  <view wx:elif="{{phase === 'holding' || phase === 'cancel' || phase === 'locked'}}" class="record-bottom">
+    <text wx:if="{{phase === 'holding'}}" class="bottom-hint">松手转文字 · 上滑取消</text>
+    <button wx:if="{{phase === 'locked'}}" class="cancel-button" catchtap="cancel">取消录音</button>
+    <view class="record-arc"><image src="/icons/mic-gray.svg"/></view>
+  </view>
+</view>

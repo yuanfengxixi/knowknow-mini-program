@@ -1,0 +1,26 @@
+<view class="tn-bar {{activeTab === 'account' ? 'tn-account-page' : ''}}" style="height:{{barHeight}}px">
+  <view
+    class="tn-side tn-account"
+    style="top:{{navTop}}px;height:{{navHeight}}px"
+    data-tab="account"
+    bindtap="onTap"
+    aria-role="button"
+    aria-label="个人中心"
+  ><image class="tn-side-ico" src="/icons/user.svg" mode="aspectFit"/></view>
+
+  <view class="tn-main" style="top:{{navTop}}px;height:{{navHeight}}px">
+    <view class="tn-tab {{activeTab === 'chat' ? 'tn-on' : ''}}" data-tab="chat" bindtap="onTap">
+      <view class="tn-hit">
+        <image class="tn-tab-ico" src="/icons/chat{{activeTab === 'chat' ? '-green' : ''}}.svg" mode="aspectFit"/>
+        <text class="tn-label">聊天</text>
+      </view>
+    </view>
+    <view class="tn-tab {{activeTab === 'library' ? 'tn-on' : ''}}" data-tab="library" bindtap="onTap">
+      <view class="tn-hit">
+        <image class="tn-tab-ico" src="/icons/library{{activeTab === 'library' ? '-green' : ''}}.svg" mode="aspectFit"/>
+        <text class="tn-label">笔记</text>
+      </view>
+    </view>
+  </view>
+
+</view>

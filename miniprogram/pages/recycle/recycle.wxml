@@ -1,0 +1,25 @@
+<view class="recycle">
+  <view class="r-title">{{note ? note.title : (path || '回收站')}}</view>
+  <view class="r-sub">删除的笔记和文件夹保留 30 天，可恢复</view>
+
+  <view wx:if="{{error}}" class="empty">{{error}}<button bindtap="load">重试</button></view>
+  <view wx:if="{{note}}" class="deleted-note"><text class="item-date">{{dateText}}</text><text class="deleted-content" user-select>{{note.content || '这篇笔记没有正文'}}</text><image wx:for="{{note.images}}" wx:key="*this" src="{{item}}" mode="widthFix" data-src="{{item}}" bindtap="previewImage"/><button data-kind="note" data-id="{{note._id}}" bindtap="onRestore">恢复笔记</button></view>
+  <view wx:if="{{!noteId && items.length}}" class="batch-toolbar">
+    <button bindtap="toggleSelection">{{selecting ? '取消' : '选择'}}</button>
+    <block wx:if="{{selecting}}"><button bindtap="selectAll">{{allSelected ? '取消全选' : '全选'}}</button><text>已选 {{selectedCount}} 项</text></block>
+  </view>
+  <view class="item" wx:for="{{items}}" wx:key="key">
+    <text wx:if="{{selecting}}" class="item-check" data-key="{{item.key}}" bindtap="onToggleItem">{{selected[item.key] ? '✓' : '○'}}</text>
+    <view class="item-main" data-key="{{item.key}}" data-kind="{{item.kind}}" data-id="{{item.id}}" data-path="{{item.path}}" bindtap="openItem">
+      <view class="item-title">{{item.kind === 'folder' ? '📁 ' : ''}}{{item.title}}</view>
+      <view class="item-folder">{{item.sub}}</view>
+    </view>
+    <view class="item-right"><view wx:if="{{!selecting}}" class="restore-btn" data-kind="{{item.kind}}" data-id="{{item.id}}" data-path="{{item.path}}" bindtap="onRestore">恢复</view><view class="item-date">{{item.dateText}}</view></view>
+  </view>
+
+  <view class="empty" wx:if="{{!items.length && !loading && !noteId && !error}}">{{path ? '此文件夹中没有已删除内容' : '回收站是空的'}}</view>
+</view>
+
+<view wx:if="{{selecting}}" class="batch-footer"><button disabled="{{!selectedCount || busyText}}" data-action="restore" bindtap="runBatch">恢复所选</button><button class="danger" disabled="{{!selectedCount || busyText}}" data-action="delete" bindtap="runBatch">彻底删除</button></view>
+<loading-mask wx:if="{{loading}}" show="{{true}}"/>
+<operation-toast show="{{busyText ? true : false}}" text="{{busyText}}"/>

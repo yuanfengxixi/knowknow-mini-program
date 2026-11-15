@@ -1,0 +1,22 @@
+<view class="legal">
+  <block wx:for="{{blocks}}" wx:key="index">
+    <view wx:if="{{item.type === 'gap'}}" class="md-gap"></view>
+    <view wx:elif="{{item.type === 'h1'}}" class="md-h1">
+      <text wx:for="{{item.spans}}" wx:for-item="s" wx:key="index" class="{{s.bold ? 'md-b' : ''}}">{{s.text}}</text>
+    </view>
+    <view wx:elif="{{item.type === 'h2'}}" class="md-h2">
+      <text wx:for="{{item.spans}}" wx:for-item="s" wx:key="index" class="{{s.bold ? 'md-b' : ''}}">{{s.text}}</text>
+    </view>
+    <view wx:elif="{{item.type === 'quote'}}" class="md-quote">
+      <text wx:for="{{item.spans}}" wx:for-item="s" wx:key="index" class="{{s.bold ? 'md-b' : ''}}">{{s.text}}</text>
+    </view>
+    <view wx:elif="{{item.type === 'li'}}" class="md-li">
+      <text class="md-dot">·</text>
+      <text class="md-li-text"><text wx:for="{{item.spans}}" wx:for-item="s" wx:key="index" class="{{s.bold ? 'md-b' : ''}}">{{s.text}}</text></text>
+    </view>
+    <view wx:else class="md-p">
+      <text wx:for="{{item.spans}}" wx:for-item="s" wx:key="index" class="{{s.bold ? 'md-b' : ''}}">{{s.text}}</text>
+    </view>
+  </block>
+  <view class="legal-pad"></view>
+</view>

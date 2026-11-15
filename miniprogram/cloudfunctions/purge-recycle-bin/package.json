@@ -1,0 +1,9 @@
+{
+  "name": "purge-recycle-bin",
+  "version": "0.1.0",
+  "description": "say - 清理30天回收站（定时）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

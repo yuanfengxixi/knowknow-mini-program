@@ -1,0 +1,28 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/library/library",
+    "pages/onboarding/onboarding",
+    "pages/note/note",
+    "pages/profile/profile",
+    "pages/account/account",
+    "pages/membership/membership",
+    "pages/recycle/recycle",
+    "pages/legal/legal"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "知知",
+    "backgroundColor": "#ffffff",
+    "enablePullDownRefresh": false
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.10",
+      "provider": "wx069ba97219f66d99"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "restore-note",
+  "version": "0.1.0",
+  "description": "say - 回收站恢复笔记",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

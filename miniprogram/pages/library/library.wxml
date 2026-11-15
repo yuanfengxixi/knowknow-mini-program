@@ -1,0 +1,230 @@
+<view class="page">
+  <loading-mask show="{{booting}}" bg="#F3F3F0"/>
+  <top-nav activeTab="library" bindtabchange="onNavChange"/>
+
+  <!-- 工具栏 -->
+  <view class="search-bar">
+    <image class="search-icon" src="/icons/search.svg" mode="aspectFit"/>
+    <input value="{{searchText}}" placeholder="搜索笔记标题或内容..." placeholder-class="search-placeholder" maxlength="128" bindinput="onSearchInput"/>
+    <text wx:if="{{searchText}}" class="search-clear" bindtap="clearSearch">✕</text>
+  </view>
+  <view class="lib-toolbar">
+    <view class="lib-tool-btn" bindtap="newFolder" wx:if="{{!selecting}}">
+      <image class="tool-ico" src="/icons/folder-plus.svg" mode="aspectFit"/>
+    </view>
+    <view class="lib-tool-btn" bindtap="newNote" wx:if="{{!selecting}}">
+      <image class="tool-ico" src="/icons/file-plus.svg" mode="aspectFit"/>
+    </view>
+    <view class="lib-tool-btn" bindtap="toggleAllFolders">
+      <image class="tool-ico" src="/icons/{{allExpanded ? 'collapse-all' : 'expand-all'}}.svg" mode="aspectFit"/>
+    </view>
+    <button wx:if="{{selecting}}" class="export-entry" bindtap="toggleSelection">取消选择</button>
+  </view>
+  <view wx:if="{{selecting}}" class="export-toolbar"><text>已选 {{selectedCount}} 篇</text><button bindtap="selectAllNotes">{{allSelected ? '取消全选' : '全选'}}</button><button bindtap="exportSelected" disabled="{{!selectedCount || exporting}}">{{exporting ? '导出中…' : '导出所选'}}</button></view>
+
+  <!-- Obsidian 风格文件树 -->
+  <scroll-view scroll-y scroll-top="{{treeScrollTop}}" scroll-with-animation="{{false}}" bindtouchstart="cancelTreeScroll" scroll-into-view="{{treeScrollTarget}}"
+    class="lib-tree {{dragState.active ? 'tree-dim' : ''}}"
+    bindscroll="onTreeScroll">
+    <view wx:if="{{searchText}}" class="search-results">
+      <view wx:for="{{searchResults}}" wx:key="_id" class="search-result" data-id="{{item._id}}" bindtap="openSearchNote">
+        <text wx:if="{{selecting}}" class="note-check" data-id="{{item._id}}" catchtap="selectSearchNote">{{selectedNotes[item._id] ? '✓' : ''}}</text>
+        <image class="search-result-icon" src="/icons/note.svg" mode="aspectFit"/>
+        <view class="search-body"><view>{{item.title || '无标题'}}</view><text class="search-excerpt">{{item.excerpt}}</text><text class="search-folder">{{item.folder}}</text></view>
+      </view>
+      <view wx:if="{{searching}}" class="search-status"><zhizhi mode="bounce" size="100"/><text>正在搜索…</text></view>
+      <view wx:elif="{{searchError}}" class="search-status" bindtap="retrySearch">{{searchError}} · 点击重试</view>
+      <view wx:elif="{{!searchResults.length}}" class="search-status">没有找到相关笔记</view>
+      <button wx:if="{{searchMore && !searching}}" bindtap="searchMoreNotes">查看更多</button>
+    </view>
+    <block wx:if="{{!searchText}}">
+    <block wx:for="{{treeData}}" wx:for-item="f" wx:key="path">
+      <!-- 根目录笔记（Obsidian 心智：文件夹之后平铺在顶层） -->
+      <view wx:if="{{f.type === 'note'}}"
+        class="tree-item is-note lv0"
+        data-type="note" data-id="{{f.noteId}}" data-name="{{f.title}}"
+        bindtap="openNote" bindlongpress="onItemLongPress"
+        bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+        <text wx:if="{{selecting}}" class="note-check">{{selectedNotes[f.noteId] ? '✓' : ''}}</text><image class="tree-type-icon" src="/icons/note.svg" mode="aspectFit"/><text class="tree-title">{{f.title}}</text>
+      </view>
+
+      <view wx:else class="tree-item is-folder lv0 {{activeFolder === f.path ? 'active' : ''}} {{dragState.targetFolder === f.path ? 'drop-target' : ''}} {{droppedPath === f.path ? 'dropped' : ''}}"
+        data-type="folder" data-path="{{f.path}}" data-name="{{f.name}}"
+        bindtap="toggle" bindlongpress="onItemLongPress"
+        bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+        <view class="tree-chevron {{f.open ? 'expanded' : ''}}">
+          <image class="chevron-ico" src="/icons/chevron-right.svg" mode="aspectFit"/>
+        </view>
+        <image class="tree-type-icon" src="/icons/folder.svg" mode="aspectFit"/><text class="tree-title">{{f.name}}</text><text class="tree-count" wx:if="{{f.totalNoteCount}}">{{f.totalNoteCount}}</text>
+      </view>
+
+      <view wx:if="{{f.open && (f.children.length || (inlineCreate && inlineCreate.parentPath === f.path))}}" class="tree-children">
+        <view class="vline" style="left:58rpx"></view>
+        <block wx:for="{{f.children}}" wx:for-item="c" wx:key="key">
+          <view wx:if="{{c.type === 'folder'}}"
+            class="tree-item is-folder lv1 {{activeFolder === c.path ? 'active' : ''}} {{c.isLastChild ? 'last' : ''}} {{dragState.targetFolder === c.path ? 'drop-target' : ''}} {{droppedPath === c.path ? 'dropped' : ''}}"
+            data-type="folder" data-path="{{c.path}}" data-name="{{c.name}}"
+            bindtap="toggle" bindlongpress="onItemLongPress"
+            bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+            <view class="tree-chevron {{c.open ? 'expanded' : ''}}">
+              <image class="chevron-ico" src="/icons/chevron-right.svg" mode="aspectFit"/>
+            </view>
+            <image class="tree-type-icon" src="/icons/folder.svg" mode="aspectFit"/><text class="tree-title">{{c.name}}</text><text class="tree-count" wx:if="{{c.totalNoteCount}}">{{c.totalNoteCount}}</text>
+          </view>
+
+          <view wx:if="{{c.type === 'folder' && c.open && (c.children.length || (inlineCreate && inlineCreate.parentPath === c.path))}}" class="tree-children">
+            <view class="vline" style="left:110rpx"></view>
+            <block wx:for="{{c.children}}" wx:for-item="cc" wx:key="key">
+              <view wx:if="{{cc.type === 'folder'}}"
+                class="tree-item is-folder lv2 {{activeFolder === cc.path ? 'active' : ''}} {{cc.isLastChild ? 'last' : ''}} {{dragState.targetFolder === cc.path ? 'drop-target' : ''}} {{droppedPath === cc.path ? 'dropped' : ''}}"
+                data-type="folder" data-path="{{cc.path}}" data-name="{{cc.name}}"
+                bindtap="toggle" bindlongpress="onItemLongPress"
+                bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+                <view class="tree-chevron {{cc.open ? 'expanded' : ''}}">
+                  <image class="chevron-ico" src="/icons/chevron-right.svg" mode="aspectFit"/>
+                </view>
+                <image class="tree-type-icon" src="/icons/folder.svg" mode="aspectFit"/><text class="tree-title">{{cc.name}}</text><text class="tree-count" wx:if="{{cc.totalNoteCount}}">{{cc.totalNoteCount}}</text>
+              </view>
+
+              <view wx:if="{{cc.type === 'folder' && cc.open && (cc.children.length || (inlineCreate && inlineCreate.parentPath === cc.path))}}" class="tree-children">
+                <view class="vline" style="left:162rpx"></view>
+                <block wx:for="{{cc.children}}" wx:for-item="ccc" wx:key="key">
+                  <view wx:if="{{ccc.type === 'note'}}"
+                    class="tree-item is-note lv3 {{ccc.isLastChild ? 'last' : ''}}"
+                    data-type="note" data-id="{{ccc.noteId}}" data-name="{{ccc.title}}"
+                    bindtap="openNote" bindlongpress="onItemLongPress"
+                    bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+                    <text wx:if="{{selecting}}" class="note-check">{{selectedNotes[ccc.noteId] ? '✓' : ''}}</text><image class="tree-type-icon" src="/icons/note.svg" mode="aspectFit"/><text class="tree-title">{{ccc.title}}</text>
+                  </view>
+                </block>
+                <!-- 行内新建输入（lv3） -->
+                <view id="inline-create-target" wx:if="{{inlineCreate && inlineCreate.parentPath === cc.path}}" class="tree-item inline-new-item lv3">
+                  <input class="inline-input" value="{{inlineCreate.value}}" placeholder="{{inlineCreate.type === 'folder' ? '文件夹名' : '笔记标题'}}" bindinput="onInlineInput" bindblur="onInlineBlur" bindconfirm="onInlineConfirm" focus="{{inlineFocus}}" adjust-position="{{false}}" maxlength="50" confirm-type="done"/>
+                  <text class="inline-ok" bindtouchstart="onInlineTapGuard" catchtap="onInlineConfirm">✓</text><text class="inline-cancel" bindtouchstart="onInlineTapGuard" catchtap="cancelInline">✕</text>
+                </view>
+              </view>
+
+              <view wx:if="{{cc.type === 'note'}}"
+                class="tree-item is-note lv2 {{cc.isLastChild ? 'last' : ''}}"
+                data-type="note" data-id="{{cc.noteId}}" data-name="{{cc.title}}"
+                bindtap="openNote" bindlongpress="onItemLongPress"
+                bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+                <text wx:if="{{selecting}}" class="note-check">{{selectedNotes[cc.noteId] ? '✓' : ''}}</text><image class="tree-type-icon" src="/icons/note.svg" mode="aspectFit"/><text class="tree-title">{{cc.title}}</text>
+              </view>
+            </block>
+            <!-- 行内新建输入（lv2） -->
+            <view id="inline-create-target" wx:if="{{inlineCreate && inlineCreate.parentPath === c.path}}" class="tree-item inline-new-item lv2">
+              <input class="inline-input" value="{{inlineCreate.value}}" placeholder="{{inlineCreate.type === 'folder' ? '文件夹名' : '笔记标题'}}" bindinput="onInlineInput" bindblur="onInlineBlur" bindconfirm="onInlineConfirm" focus="{{inlineFocus}}" adjust-position="{{false}}" maxlength="50" confirm-type="done"/>
+              <text class="inline-ok" bindtouchstart="onInlineTapGuard" catchtap="onInlineConfirm">✓</text><text class="inline-cancel" bindtouchstart="onInlineTapGuard" catchtap="cancelInline">✕</text>
+            </view>
+          </view>
+
+          <view wx:if="{{c.type === 'note'}}"
+            class="tree-item is-note lv1 {{c.isLastChild ? 'last' : ''}}"
+            data-type="note" data-id="{{c.noteId}}" data-name="{{c.title}}"
+            bindtap="openNote" bindlongpress="onItemLongPress"
+            bindtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragEnd">
+            <text wx:if="{{selecting}}" class="note-check">{{selectedNotes[c.noteId] ? '✓' : ''}}</text><image class="tree-type-icon" src="/icons/note.svg" mode="aspectFit"/><text class="tree-title">{{c.title}}</text>
+          </view>
+        </block>
+        <!-- 行内新建输入（lv1） -->
+        <view id="inline-create-target" wx:if="{{inlineCreate && inlineCreate.parentPath === f.path}}" class="tree-item inline-new-item lv1">
+          <input class="inline-input" value="{{inlineCreate.value}}" placeholder="{{inlineCreate.type === 'folder' ? '文件夹名' : '笔记标题'}}" bindinput="onInlineInput" bindblur="onInlineBlur" bindconfirm="onInlineConfirm" focus="{{inlineFocus}}" adjust-position="{{false}}" maxlength="50" confirm-type="done"/>
+          <text class="inline-ok" bindtouchstart="onInlineTapGuard" catchtap="onInlineConfirm">✓</text><text class="inline-cancel" bindtouchstart="onInlineTapGuard" catchtap="cancelInline">✕</text>
+        </view>
+      </view>
+    </block>
+
+    <view class="lib-empty" wx:if="{{treeData.length === 0 && !loading}}">
+      <!-- 空状态知知：轻呼吸+眨眼，陪用户等第一条笔记 -->
+      <view class="lib-empty-zhizhi"><zhizhi mode="idle" size="200"/></view>
+      <view class="lib-empty-title">笔记已就绪</view>
+      <view class="lib-empty-sub">在聊天页发一条，AI 帮你归档</view>
+    </view>
+
+    <view class="tree-spacer"></view>
+
+    <!-- 兜底行内输入：父文件夹未展开时，显示在最下方 -->
+    <view id="inline-create-target" wx:if="{{showBottomInline}}" class="tree-item inline-new-item inline-fallback">
+      <input class="inline-input" value="{{inlineCreate.value}}" placeholder="{{inlineCreate.type === 'folder' ? '文件夹名' : '笔记标题'}}" bindinput="onInlineInput" bindblur="onInlineBlur" bindconfirm="onInlineConfirm" focus="{{inlineFocus}}" adjust-position="{{false}}" maxlength="50" confirm-type="done"/>
+      <text class="inline-ok" bindtouchstart="onInlineTapGuard" catchtap="onInlineConfirm">✓</text><text class="inline-cancel" bindtouchstart="onInlineTapGuard" catchtap="cancelInline">✕</text>
+    </view>
+    <!-- 键盘弹出前给列表底部留出滚动余量，否则根目录的最后一行无法上移到可视区中部。 -->
+    <view wx:if="{{inlineCreate}}" class="inline-create-scroll-space"></view>
+    </block>
+  </scroll-view>
+
+  <!-- 底部输入栏（拖拽模式下隐藏） -->
+  <view class="input-float-wrap" wx:if="{{!dragState.active && !actionDialog.visible}}">
+    <voice-input value="{{inputValue}}" placeholder="需要我帮你整理文档么" bindinput="onInput" bindsend="send"/>
+  </view>
+
+  <!-- ===== 拖拽覆盖层（纯显示） ===== -->
+  <view class="drag-overlay" wx:if="{{dragState.active}}">
+
+    <!-- 红色垃圾桶（右上角） -->
+    <view class="drag-trash {{dragState.overTrash ? 'trash-active' : ''}}">
+      <image class="trash-ico" src="/icons/trash-red.svg" mode="aspectFit"/>
+    </view>
+
+    <view class="drag-rename {{dragState.overRename ? 'rename-active' : ''}}">
+      <image class="rename-ico" src="/icons/pencil.svg" mode="aspectFit"/>
+    </view>
+
+    <!-- 拖拽中的幽灵项 -->
+    <view class="drag-ghost {{dragState.type === 'folder' ? 'ghost-folder' : 'ghost-note'}}"
+      style="left:{{dragState.ghostX}}px; top:{{dragState.ghostY}}px;">
+      <text class="ghost-icon">{{dragState.type === 'folder' ? '📂' : '📄'}}</text>
+      <text class="ghost-name">{{dragState.name}}</text>
+    </view>
+
+    <!-- 底部提示 -->
+    <view class="drag-hint">{{dragState.overTrash ? '松手即可删除' : (dragState.overRename ? '松手即可重命名' : '拖到文件夹移动 · 右侧可重命名或删除')}}</view>
+  </view>
+
+  <!-- 重命名 / 删除：统一的小程序内弹层，替代样式受限的系统弹窗 -->
+  <view wx:if="{{actionDialog.visible}}" class="action-backdrop" catchtap="closeActionDialog">
+    <view class="action-sheet" catchtap="noop" role="dialog" aria-label="{{actionDialog.title}}">
+      <view class="action-handle"></view>
+      <view class="action-icon {{actionDialog.mode === 'delete' ? 'is-danger' : ''}}">
+        <image src="/icons/{{actionDialog.mode === 'delete' ? 'trash-red' : 'pencil'}}.svg" mode="aspectFit"/>
+      </view>
+      <view class="action-title">{{actionDialog.title}}</view>
+      <view class="action-description">{{actionDialog.description}}</view>
+
+      <input wx:if="{{actionDialog.mode === 'rename'}}"
+        class="action-input"
+        value="{{actionDialog.value}}"
+        bindinput="onDialogInput"
+        focus="{{true}}"
+        select-all="{{true}}"
+        maxlength="50"
+        confirm-type="done"
+        bindconfirm="confirmActionDialog"
+        placeholder="输入新名称"/>
+
+      <view class="action-buttons">
+        <view class="action-button secondary" catchtap="closeActionDialog">取消</view>
+        <view class="action-button {{actionDialog.mode === 'delete' ? 'danger' : 'primary'}} {{actionDialog.busy ? 'is-busy' : ''}}"
+          catchtap="confirmActionDialog">
+          <view wx:if="{{actionDialog.busy}}" class="button-spinner"></view>
+          <text>{{actionDialog.busy ? '保存中…' : (actionDialog.mode === 'delete' ? '移入回收站' : '保存')}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 乐观删除状态：内容先消失，后台同步期间给克制反馈 -->
+  <view wx:if="{{operationStatus.visible}}" class="operation-status {{operationStatus.state}}">
+    <view wx:if="{{operationStatus.state === 'loading'}}" class="status-spinner"></view>
+    <view wx:elif="{{operationStatus.state === 'success'}}" class="status-mark">✓</view>
+    <view wx:else class="status-mark">!</view>
+    <text>{{operationStatus.text}}</text>
+  </view>
+</view>
+
+<operation-toast show="{{creating}}" text="正在新建…"/>
+<loading-mask wx:if="{{exporting}}" show="{{true}}" label="正在导出…" bg="rgba(243,243,240,0.94)"/>
+<view wx:if="{{preparedExport}}" class="export-ready">
+  <view class="export-ready-card"><view>文件已准备好</view><text>{{preparedExport.fileName}}</text><button bindtap="shareExport" disabled="{{sharingExport}}">发送到微信</button><button bindtap="dismissExport" disabled="{{sharingExport}}">关闭</button></view>
+</view>

@@ -1,0 +1,11 @@
+<view
+  wx:if="{{rendered}}"
+  class="lm"
+  style="background: {{bg}};"
+  catchtouchmove="noop"
+  catchtap="noop"
+>
+  <!-- 知知居中原地弹跳（2026-08-22 老板拍板：所有加载/切页统一用原地跳，横跳废弃） -->
+  <zhizhi mode="bounce" size="330" shadow="{{true}}"/>
+<text wx:if="{{label}}" class="lm-label">{{label}}</text>
+</view>

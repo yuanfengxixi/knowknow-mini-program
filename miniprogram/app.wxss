@@ -1,0 +1,41 @@
+/* 全局样式 — 极简：白底、墨黑、品牌绿唯一点缀（呼应 say 绿气泡头像）
+   原则：只有"可点的 / 你说的话"用绿，其余黑白灰 */
+page {
+  --ink: #1a1a1a;
+  --gray: #8a8a8a;
+  --line: #ededed;
+  --bg: #ffffff;
+  --brand: #07C160;        /* 微信绿（say 品牌色） */
+  --brand-deep: #06ad56;   /* 按压态 */
+  --brand-weak: #e8faf1;   /* 浅绿底（标签/弱提示） */
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 32rpx;
+  line-height: 1.6;
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999rpx;
+  text-align: center;
+  padding: 26rpx 0;
+  font-size: 32rpx;
+}
+.btn-primary:active {
+  background: var(--brand-deep);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--gray);
+  text-align: center;
+  padding: 26rpx 0;
+  font-size: 30rpx;
+}
+
+.muted {
+  color: var(--gray);
+}

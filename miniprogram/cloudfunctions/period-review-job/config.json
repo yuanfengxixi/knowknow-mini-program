@@ -1,0 +1,15 @@
+{
+  "timeout": 60,
+  "triggers": [
+    {
+      "name": "monthlyReview",
+      "type": "timer",
+      "config": "0 0 9 1 * * *"
+    },
+    {
+      "name": "yearlyReview",
+      "type": "timer",
+      "config": "0 0 9 1 1 * *"
+    }
+  ]
+}

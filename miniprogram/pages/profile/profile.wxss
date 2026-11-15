@@ -1,0 +1,19 @@
+.profile-page { min-height: 100vh; padding: 52rpx 34rpx calc(80rpx + env(safe-area-inset-bottom)); box-sizing: border-box; background: #f4f6f4; color: #1f2923; }
+.profile-header { padding: 0 8rpx 28rpx; }
+.profile-desc { max-width: 620rpx; color: #748078; font-size: 25rpx; line-height: 1.6; }
+.profile-error,.profile-empty { padding: 70rpx 30rpx; border: 1rpx solid #e8ece9; border-radius: 24rpx; background: #fff; text-align: center; color: #929b95; font-size: 25rpx; line-height: 1.6; }
+.memory-card { margin-bottom: 18rpx; padding: 28rpx 28rpx 20rpx; border: 1rpx solid #e7ebe8; border-radius: 24rpx; background: #fff; }
+.memory-editor { width: 100%; min-height: 92rpx; box-sizing: border-box; padding: 0; color: #253029; font-size: 28rpx; line-height: 1.68; }
+.memory-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12rpx; margin-top: 18rpx; padding-top: 16rpx; border-top: 1rpx solid #f0f2f0; }
+.text-action { display: inline-flex; align-items: center; justify-content: center; width: auto; margin: 0; padding: 10rpx 18rpx; min-height: 0; border-radius: 14rpx; background: transparent; color: #69736d; font-size: 23rpx; line-height: 1.2; }
+.text-action::after,.profile-add::after,.profile-undo::after { border: 0; }
+.text-action.danger { margin-left: 12rpx !important; margin-right: 0 !important; color: #a96865; }
+.text-action.primary { background: var(--brand-weak); color: var(--brand-deep); font-weight: 600; }
+.new-card { border-color: rgba(7,193,96,.24); }
+.new-card-title { margin-bottom: 20rpx; font-size: 28rpx; font-weight: 600; }
+.new-editor { min-height: 150rpx; padding: 20rpx; border-radius: 16rpx; background: #f7f9f7; }
+.new-card-tip { margin-top: 14rpx; color: #9a8a71; font-size: 21rpx; line-height: 1.5; }
+.profile-add,.profile-undo { margin-top: 22rpx; border-radius: 20rpx; font-size: 26rpx; }
+.profile-add { border: 2rpx dashed #bed9c5; background: transparent; color: #35734c; }
+.profile-undo { background: #eaf4ec; color: #477254; }
+.profile-limit { margin-top: 24rpx; color: #8a928d; font-size: 22rpx; text-align: center; }

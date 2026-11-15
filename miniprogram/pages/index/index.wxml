@@ -1,0 +1,179 @@
+<!-- 聊天页 v3 — Coze 像素级复刻：全左对齐、头像+引用条+浮动思考 -->
+<view class="page">
+  <loading-mask show="{{booting}}" bg="#F5F5F5"/>
+  <top-nav activeTab="chat" bindtabchange="onNavChange"/>
+  <view wx:if="{{modePickerOpen}}" class="mode-picker-backdrop" catchtap="closeAgentModePicker" aria-hidden="true"/>
+
+  <!-- 聊天消息流 -->
+  <scroll-view scroll-y class="chat" lower-threshold="80" bindscroll="onChatScroll" bindscrolltolower="onChatScrollToLower" scroll-into-view="{{scrollTarget}}" scroll-with-animation="{{scrollWithAnimation}}">
+    <view
+      wx:for="{{messages}}"
+      wx:key="id"
+      id="{{item.id}}"
+      class="msg-row {{item.role}}"
+    >
+      <!-- AI 头像：知知形象。只有最新一条 AI 消息带呼吸+眨眼动画，
+           历史消息用静态整图，防几十条消息同时跑动画导致卡顿 -->
+      <view wx:if="{{item.role === 'ai'}}" class="msg-avatar {{modePickerOpen && modePickerMessageId === item.id ? 'picker-open' : ''}}" data-id="{{item.id}}" catchtap="toggleAgentMode" aria-role="button" aria-label="选择思考或纯记录模式">
+        <task-avatar wx:if="{{item.taskProtocol === 2}}" pending="{{item.taskPending}}" status="{{item.taskStatus}}" started-at="{{item.taskCreatedAt}}" attempt="{{item.taskAttempt}}" variant="{{item.id === latestAiId ? agentMode : (item.agentMode || 'think')}}"/>
+        <zhizhi wx:elif="{{item.id === latestAiId}}" mode="{{agentMode === 'record' ? 'static' : 'idle'}}" size="66" variant="{{agentMode}}"/>
+        <zhizhi wx:elif="{{item.agentMode === 'record'}}" mode="static" size="66" variant="record"/>
+        <image wx:else class="msg-avatar-img" src="/images/zhizhi/char.png" mode="scaleToFill"/>
+        <view wx:if="{{modePickerOpen && modePickerMessageId === item.id}}" class="mode-picker" catchtap="noop">
+          <view class="mode-option {{agentMode === 'think' ? 'active' : ''}}" data-mode="think" catchtap="selectAgentMode" aria-role="radio" aria-checked="{{agentMode === 'think'}}">
+            <text class="mode-option-icon think">✦</text>
+            <view class="mode-option-copy"><text class="mode-option-title">思考</text><text class="mode-option-desc">多理解，多分析</text></view>
+            <view class="mode-option-radio"><view wx:if="{{agentMode === 'think'}}"/></view>
+          </view>
+          <view class="mode-option {{agentMode === 'record' ? 'active' : ''}}" data-mode="record" catchtap="selectAgentMode" aria-role="radio" aria-checked="{{agentMode === 'record'}}">
+            <text class="mode-option-icon record">●</text>
+            <view class="mode-option-copy"><text class="mode-option-title">纯记录</text></view>
+            <view class="mode-option-radio"><view wx:if="{{agentMode === 'record'}}"/></view>
+          </view>
+        </view>
+      </view>
+      <!-- 消息体 -->
+      <view class="msg-body">
+        <!-- 时间 -->
+        <view class="msg-time">{{item.timeLabel || ''}}</view>
+        <view wx:if="{{item.role === 'ai' && item.taskProtocol === 2 && item.taskTraceVisible && item.taskSteps && item.taskSteps.length}}" class="task-trace">
+          <view class="task-trace-summary" data-id="{{item.id}}" catchtap="onToggleTaskSteps">
+            <text>{{item.taskPending ? item.taskProgress : '查看处理过程'}}</text><text class="task-trace-chevron">{{item.taskStepsOpen ? '⌃' : '⌄'}}</text>
+          </view>
+          <view wx:if="{{item.taskStepsOpen}}" class="task-trace-list">
+            <view wx:for="{{item.taskSteps}}" wx:key="id" class="task-trace-item"><text wx:if="{{item.status !== 'succeeded'}}" class="trace-state {{item.status}}">{{item.status === 'running' ? '进行中' : (item.status === 'interrupted' ? '中断' : '失败')}}</text><text>{{item.label}}</text></view>
+          </view>
+        </view>
+
+        <!-- 气泡：引用条并入气泡内部（不再是独立方框）。
+             AI 走排版块 + 原生局部选中；用户走纯文本节点上的长按整条复制 -->
+        <view
+          wx:if="{{item.text}}"
+          class="msg-bubble {{item.role}}"
+          user-select="{{true}}"
+        >
+          <!-- AI 回复：结构化排版块（标题/列表/段落，超长默认折叠）；无 blocks 时兜底纯文本 -->
+          <view wx:if="{{item.role === 'ai' && item.taskPending && item.text === '正在处理'}}" class="processing-line">
+            <text>{{item.text}}</text>
+            <view class="processing-dots" aria-hidden="true"><view></view><view></view><view></view></view>
+          </view>
+          <block wx:elif="{{item.role === 'ai' && item.blocks && item.blocks.length}}">
+            <!-- user-select 只对 text 组件生效，必须挂在每个块的 text 节点上，挂 view 上长按复制会失效 -->
+            <view class="msg-blocks {{item.foldable && item.folded ? 'mb-folded' : ''}}">
+              <block wx:for="{{item.blocks}}" wx:for-item="blk" wx:key="k">
+                <view wx:if="{{blk.type === 'heading'}}" class="mb-heading"><text user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text></view>
+                <view wx:elif="{{blk.type === 'bullet'}}" class="mb-bullet"><text class="mb-marker">{{blk.ordinal ? blk.ordinal : '•'}}</text><text class="mb-bullet-text" user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text></view>
+                <text wx:else class="mb-para" user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text>
+              </block>
+            </view>
+          </block>
+          <!-- 纯文本路径：用户消息 + 没解析出块的 AI 消息。超 5 行的用户消息夹到 5 行。
+               长按整条复制只挂在这个文字节点上——挂到外层气泡会让下面的折叠按钮变成它的后代，
+               longpress 一触发 tap 就不再触发，按钮就点不动了。
+               同理不再留 user-select：整条接管和原生选中并存会弹两套复制 UI -->
+          <text wx:elif="{{item.text}}" class="msg-bubble-text {{item.foldable && item.folded ? 'text-folded' : ''}}" data-id="{{item.id}}" bindlongpress="onCopyMessage">{{item.text}}</text>
+          <!-- 展开/收起：AI 长回复和用户长消息共用一个按钮，是上面文字节点的兄弟不是后代 -->
+          <view wx:if="{{item.foldable}}" class="mb-fold-btn" data-id="{{item.id}}" catchtap="onToggleFold">{{item.folded ? '展开全部' : '收起'}}</view>
+        </view>
+
+        <view wx:if="{{item.role === 'ai' && item.taskProtocol >= 1}}" class="query-task-status">
+          <text wx:if="{{item.taskConnection}}">{{item.taskConnection}}</text>
+          <button wx:if="{{item.taskNeedsMembership && (!membershipActive || creditEmpty)}}" class="query-task-retry" bindtap="openMembership">{{membershipActive ? '重新购买月卡' : '开通会员'}}</button>
+          <button wx:elif="{{item.taskProtocol === 2 && item.taskRetryable && (item.taskStatus === 'failed' || item.taskConnection)}}" class="query-task-retry" data-id="{{item.id}}" bindtap="retryQuery">{{item.taskStatus === 'failed' ? '重试' : '刷新进度'}}</button>
+          <button wx:if="{{item.taskProtocol === 2 && item.taskStatus === 'waiting_confirmation'}}" class="query-task-retry" data-id="{{item.id}}" bindtap="cancelTask">取消旧操作</button>
+          <button wx:if="{{item.taskFileID}}" class="query-task-retry" data-id="{{item.id}}" bindtap="downloadTask">下载文件</button>
+        </view>
+        <view wx:if="{{item.role === 'ai' && item.memoryUpdated}}" class="query-task-status"><text>已更新 AI 了解的我</text></view>
+
+        <!-- 图片消息（周计划等） -->
+        <image
+          wx:if="{{item.image}}"
+          class="msg-img"
+          src="{{item.image}}"
+          mode="widthFix"
+          data-src="{{item.image}}"
+          bindtap="previewImage"
+          show-menu-by-longpress
+        ></image>
+
+        <view wx:if="{{item.file}}" class="msg-file">
+          <image class="msg-file-icon" src="/icons/file-plus.svg" mode="aspectFit"/>
+          <view class="msg-file-copy">
+            <text class="msg-file-name">{{item.file.name}}</text>
+            <text class="msg-file-size">{{item.file.sizeText}}</text>
+          </view>
+        </view>
+
+        <!-- 笔记卡片列表 -->
+        <view wx:if="{{item.notes && item.notes.length}}" class="hit-list">
+          <view
+            class="hit {{n.merged || n.isNew ? 'hit-merged' : ''}}"
+            wx:for="{{item.notes}}"
+            wx:for-item="n"
+            wx:key="_id"
+            data-id="{{n._id}}"
+            catchtap="openNote"
+            user-select="{{true}}"
+          >
+            {{n.title}}
+            <text wx:if="{{!n.merged && n.isNew}}" class="hit-merged-tag">新建</text>
+            <text wx:if="{{n.merged}}" class="hit-merged-tag">已更新</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="chat-pad"></view>
+  </scroll-view>
+
+  <!-- 待发送图片预览 -->
+  <view wx:if="{{pendingImage}}" class="pending-img">
+    <image class="pi-thumb" src="{{pendingImage.preview}}" mode="aspectFill"></image>
+    <text class="pi-tip">图片已就绪，可加一句说明再发</text>
+    <text class="pi-del" catchtap="removePendingImage">✕</text>
+  </view>
+
+  <view wx:if="{{pendingFile}}" class="pending-file">
+    <image class="pf-icon" src="/icons/file-plus.svg" mode="aspectFit"/>
+    <view class="pf-copy">
+      <text class="pf-name">{{pendingFile.name}}</text>
+      <text class="pf-size">{{pendingFile.sizeText}}</text>
+    </view>
+    <text class="pf-del" catchtap="removePendingFile">✕</text>
+  </view>
+
+  <!-- 底部输入区（悬浮卡片） -->
+  <view class="input-float-wrap {{attachMenuOpen ? 'menu-open' : ''}}">
+    <view wx:if="{{!membershipActive && (renewalRequired || trialRemaining === 0 || trialWarningVisible)}}" class="trial-reminder">
+      <text>{{renewalRequired ? '会员已到期' : (trialRemaining === 0 ? '30 次免费记录已用完' : '免费记录还剩 5 次')}}</text>
+      <text wx:if="{{renewalRequired || trialRemaining === 0}}" class="trial-open" bindtap="openMembership">{{renewalRequired ? '续费会员 ›' : '开通会员 ›'}}</text>
+      <text wx:else class="trial-dismiss" bindtap="dismissTrialWarning" aria-role="button" aria-label="关闭免费额度提醒">×</text>
+    </view>
+    <view wx:if="{{creditNotice}}" class="credit-notice">
+      <view class="credit-notice-copy">
+        <text class="credit-notice-title">{{creditEmpty ? '本期积分已用完' : '本期积分剩余 10% 或更少'}}</text>
+        <text class="credit-notice-detail">{{creditEmpty ? '重新购买月卡，即可获得 10000 积分。' : '还剩 ' + remainingCredits + ' 积分，用完后可重新购买月卡。'}}</text>
+        <text wx:if="{{creditEmpty}}" class="credit-notice-link" bindtap="openMembership">重新购买月卡</text>
+      </view>
+      <view class="credit-notice-close" bindtap="dismissCredits" aria-role="button" aria-label="关闭积分提醒">×</view>
+    </view>
+    <view class="composer-row">
+      <view class="new-chat-pill {{newConversationArmed ? 'active' : ''}}" bindtap="toggleNewConversation" aria-role="button" aria-label="下一条消息开启新对话">新</view>
+      <voice-input class="composer-input" value="{{inputValue}}" placeholder="{{pendingFile ? '说说这份文件要怎么用…' : (agentMode === 'record' ? '说点什么，我只负责记下来…' : '发消息或按住说话…')}}" attachment="{{true}}" attachment-open="{{attachMenuOpen}}" has-attachment="{{pendingImage || pendingFile}}" bindinput="onInput" bindfocus="closeAttachMenu" bindmodechange="closeAttachMenu" bindsend="send" bindattach="openAttachMenu"/>
+    </view>
+    <!-- 生成内容标识（《生成式人工智能服务管理暂行办法》要求对 AI 生成内容作标识）。
+         放输入框下方常驻一行，不进消息流：逐条标注会和归档状态行叠成两行灰字，
+         把笔记卡片越推越远，连发十条就重复十次 -->
+    <text class="ai-tip">{{agentMode === 'record' ? 'AI 整理后写入笔记' : '回复由 AI 生成'}}</text>
+  </view>
+
+  <view wx:if="{{attachMenuOpen}}" class="attach-panel">
+    <view class="attach-grid">
+      <view wx:for="{{attachMenuItems}}" wx:key="kind" class="attach-option" data-kind="{{item.kind}}" catchtap="pickAttachment" aria-role="button" aria-label="{{item.label}}">
+        <view class="attach-icon-wrap"><image class="attach-icon" src="{{item.icon}}" mode="aspectFit"/></view>
+        <text class="attach-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<operation-toast show="{{busyText ? true : false}}" text="{{busyText}}"/>

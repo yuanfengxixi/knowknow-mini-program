@@ -1,0 +1,11 @@
+{
+  "name": "web-service",
+  "version": "1.0.0",
+  "description": "知知网页版微信登录、笔记与 Agent 任务",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "openai": "4.24.0",
+    "tencentcloud-sdk-nodejs-scf": "^4.0.0"
+  }
+}

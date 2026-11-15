@@ -1,0 +1,9 @@
+{
+  "name": "init-folders",
+  "version": "0.1.0",
+  "description": "say - 引导：种预设知识库结构 + 保存长期记忆",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

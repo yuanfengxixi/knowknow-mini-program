@@ -1,0 +1,12 @@
+/* 所有动画由回执状态驱动，离页回来可以直接重建；文字始终可用。 */
+.task-character { position: relative; width: 66rpx; height: 50rpx; }
+.task-prop { position: absolute; right: -10rpx; bottom: 0; width: 17rpx; height: 23rpx; border: 2rpx solid #8eb6a1; border-radius: 3rpx; background: #e8faf1; transform-origin: left center; }
+.task-paper { margin: 5rpx 3rpx; height: 8rpx; border-top: 2rpx solid #71a88a; border-bottom: 2rpx solid #71a88a; }
+.task-queued .task-prop { animation: task-door 2.4s ease-in-out infinite; }
+.task-executing .task-paper { animation: task-page 1.8s ease-in-out infinite; }
+.task-complete { position: absolute; bottom: -5rpx; right: -10rpx; font-size: 22rpx; color: #07c160; }
+@keyframes task-door { 0%,100% { transform: perspective(60rpx) rotateY(0deg); } 50% { transform: perspective(60rpx) rotateY(-65deg); } }
+@keyframes task-page { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-4rpx) rotate(-12deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .task-character, .task-prop, .task-paper { animation: none !important; transform: none !important; }
+}

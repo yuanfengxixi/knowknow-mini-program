@@ -1,0 +1,15 @@
+<view class="zz zz-m-{{mode}}" style="width:{{size}}rpx;">
+  <view class="zz-hopper">
+    <view class="zz-char">
+      <!-- static：整图一张，不跑任何动画 -->
+      <image wx:if="{{mode === 'static'}}" class="zz-full" src="/images/zhizhi/char.png" mode="scaleToFill"/>
+      <block wx:else>
+        <image class="zz-body" src="/images/zhizhi/body.png" mode="scaleToFill"/>
+        <image class="zz-eye zz-eye-l" src="/images/zhizhi/eye-l.png" mode="scaleToFill"/>
+        <image class="zz-eye zz-eye-r" src="/images/zhizhi/eye-r.png" mode="scaleToFill"/>
+      </block>
+      <image wx:if="{{variant === 'record' || glassesMotion === 'remove'}}" class="zz-glasses zz-glasses-{{glassesMotion}}" src="/images/zhizhi/glasses.svg" mode="scaleToFill"/>
+    </view>
+  </view>
+  <view wx:if="{{shadow}}" class="zz-shadow"></view>
+</view>

@@ -1,0 +1,9 @@
+{
+  "name": "list-notes",
+  "version": "0.1.0",
+  "description": "say - 读云端目录+笔记树",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

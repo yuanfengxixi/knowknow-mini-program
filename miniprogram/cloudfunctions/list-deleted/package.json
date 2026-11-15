@@ -1,0 +1,9 @@
+{
+  "name": "list-deleted",
+  "version": "0.1.0",
+  "description": "say - 回收站笔记列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

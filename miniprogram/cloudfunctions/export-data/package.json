@@ -1,0 +1,10 @@
+{
+  "name": "export-data",
+  "version": "0.1.0",
+  "description": "say - 导出 md/zip/pdf",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "jszip": "^3.10.1"
+  }
+}

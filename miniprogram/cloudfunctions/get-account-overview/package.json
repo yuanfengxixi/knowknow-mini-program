@@ -1,0 +1,9 @@
+{
+  "name": "get-account-overview",
+  "version": "1.0.0",
+  "description": "知知 - 个人中心真实记录概览",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

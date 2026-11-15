@@ -1,0 +1,7 @@
+{
+  "timeout": 90,
+  "memorySize": 256,
+  "triggers": [
+    { "name": "virtualPaymentRecovery", "type": "timer", "config": "0 * * * * * *" }
+  ]
+}

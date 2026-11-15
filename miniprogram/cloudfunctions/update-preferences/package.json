@@ -1,0 +1,10 @@
+{
+  "name": "update-preferences",
+  "version": "0.1.0",
+  "description": "say - 用户修正→静默学偏好",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "openai": "4.24.0"
+  }
+}

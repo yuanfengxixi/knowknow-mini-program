@@ -1,0 +1,9 @@
+{
+  "name": "daily-quota-reset",
+  "version": "0.1.0",
+  "description": "say - 每日重置记录配额（定时）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

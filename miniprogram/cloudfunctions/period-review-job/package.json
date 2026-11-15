@@ -1,0 +1,10 @@
+{
+  "name": "period-review-job",
+  "version": "0.1.0",
+  "description": "say - 月度/年度自动复盘（定时，参数化合并）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "tencentcloud-sdk-nodejs-scf": "^4.0.0"
+  }
+}

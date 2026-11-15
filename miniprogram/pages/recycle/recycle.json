@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "loading-mask": "/components/loading-mask/loading-mask",
+    "operation-toast": "/components/operation-toast/operation-toast"
+  }
+}

@@ -1,0 +1,33 @@
+<view class="member-page">
+  <view class="member-hero">
+    <text class="eyebrow">KNOW KNOW MEMBER</text>
+    <text class="hero-title">把重要的想法，继续想下去</text>
+    <text class="hero-desc">每个会员周期 10,000 积分，按 AI 模型实际成本消耗；笔记数量不限，历史内容始终可查看和导出。</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="state-card">正在读取会员状态…</view>
+  <view wx:if="{{!loading && membership.active}}" class="status-card active">
+    <view><text class="status-label">当前会员</text><text class="status-title">知知月卡</text></view>
+    <text class="status-badge">有效</text>
+    <view class="quota-line"><text>本期剩余积分</text><text>{{membership.remainingCredits}} / {{membership.creditLimit}} 积分</text></view>
+    <view class="quota-track"><view style="width:{{membership.usedCredits / membership.creditLimit * 100}}%"></view></view>
+    <text class="expire">有效期至 {{endText}}</text>
+  </view>
+
+  <block wx:if="{{!loading && membership.canPurchase}}">
+    <view class="plan-card selected">
+      <view class="plan-head"><view><text class="plan-name">购买月卡</text><text class="plan-note">单次购买，不自动续费</text></view><view class="price"><text>¥</text>{{price}}</view></view>
+      <view class="benefit"><text>✓</text><text>一个月会员有效期</text></view>
+      <view class="benefit"><text>✓</text><text>每期 10,000 积分，按实际模型成本消耗</text></view>
+      <view class="benefit"><text>✓</text><text>会员期内不限笔记数量</text></view>
+    </view>
+    <text wx:if="{{membership.active}}" class="expire">积分用完后重新购买，新周期从本次付款起算一个月，旧周期结束。</text>
+    <checkbox-group bindchange="toggleAgreement" class="agreement">
+      <label><checkbox value="agree" checked="{{agreed}}" color="#07C160"/><text>我已阅读并同意</text><text class="agreement-link" catchtap="openAgreement">《知知会员服务协议》</text></label>
+    </checkbox-group>
+    <button class="pay-button" loading="{{paying}}" disabled="{{paying}}" bindtap="buyOnce">¥{{price}} {{membership.active ? '重新购买月卡' : '开通一个月'}}</button>
+  </block>
+
+  <view wx:if="{{error}}" class="error" bindtap="loadMembership">{{error}} · 点击重试</view>
+  <view class="terms">请配置适用于你服务的会员规则和退款说明，并在发布前完成法律审查。</view>
+</view>

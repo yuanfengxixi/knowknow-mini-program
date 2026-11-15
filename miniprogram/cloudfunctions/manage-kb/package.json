@@ -1,0 +1,9 @@
+{
+  "name": "manage-kb",
+  "version": "0.1.0",
+  "description": "say - 知识库管理：批量删/建文件夹/建笔记",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

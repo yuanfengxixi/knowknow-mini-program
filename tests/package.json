@@ -1,0 +1,10 @@
+{
+  "name": "knowknow-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node.js unit tests for the KnowKnow CloudBase functions",
+  "scripts": {
+    "pretest": "node ../scripts/sync-cloudfunction-shared.cjs",
+    "test": "node --test *.test.js"
+  }
+}

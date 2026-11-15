@@ -1,0 +1,62 @@
+.note-page { padding: 32rpx 36rpx 20rpx; }
+
+.n-title-input {
+  font-size: 42rpx; font-weight: 700; width: 100%;
+  padding: 12rpx 0; margin-bottom: 4rpx;
+}
+.n-folder { font-size: 26rpx; margin-bottom: 28rpx; }
+.n-image {
+  width: 100%; border-radius: 16rpx; margin: 12rpx 0;
+}
+
+/* 正文编辑态：textarea 原始文本 */
+.n-content-edit {
+  width: 100%; font-size: 31rpx; line-height: 1.75; color: #2a2a2a;
+  min-height: 300rpx; padding: 16rpx 0;
+  -webkit-user-select: text; user-select: text;
+}
+
+/* 正文阅读态：排版块（类名对照聊天页 mb-*，作用域限定本页，字号随本页 31rpx） */
+.n-content-read {
+  min-height: 300rpx; padding: 16rpx 0;
+  font-size: 31rpx; line-height: 1.75; color: #2a2a2a;
+}
+.n-content-read .mb-heading { font-size: 33rpx; font-weight: 600; margin: 20rpx 0 10rpx; }
+.n-content-read .mb-heading:first-child { margin-top: 0; }
+.n-content-read .mb-bullet { display: flex; align-items: flex-start; margin-bottom: 10rpx; }
+.n-content-read .mb-marker { flex-shrink: 0; width: 40rpx; color: #b0b0b3; }
+.n-content-read .mb-bullet-text { flex: 1; min-width: 0; }
+.n-content-read .mb-para { display: block; margin-bottom: 14rpx; }
+.n-content-read .mb-b { font-weight: 600; }
+
+.ico-mic { width:36rpx; height:36rpx; }
+
+.n-related {
+  margin-top: 36rpx; padding: 24rpx;
+  background: #fff; border-radius: 20rpx;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.nr-title { font-size: 26rpx; color: var(--brand); margin-bottom: 8rpx; }
+.nr-item {
+  padding: 14rpx 0; font-size: 29rpx; color: var(--brand);
+  border-bottom: 1rpx solid rgba(7, 193, 96, 0.12);
+}
+.nr-item:last-child { border-bottom: none; }
+
+.n-chat-btn {
+  display: block; text-align: center;
+  margin: 24rpx auto 0; padding: 18rpx 0;
+  font-size: 28rpx; color: var(--brand);
+  background: var(--brand-weak); border-radius: 999rpx;
+  width: 340rpx;
+}
+
+.n-bottom-spacer { height: 140rpx; }
+.loading { text-align: center; margin-top: 40vh; }
+
+/* 底部输入栏（悬浮卡片 — 与聊天页一致） */
+.note-input-wrap {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  padding: 16rpx 20rpx calc(40rpx + env(safe-area-inset-bottom));
+  background: transparent;
+}

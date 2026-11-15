@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "zhizhi": "/components/zhizhi/zhizhi",
+    "loading-mask": "/components/loading-mask/loading-mask"
+  }
+}

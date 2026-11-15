@@ -1,0 +1,49 @@
+:host { display:block; width:100%; }
+.voice-bar { display:flex; align-items:center; gap:12rpx; background:#fff; border:1rpx solid #e5e5e5; border-radius:28rpx; padding:12rpx 16rpx; min-height:68rpx; }
+.typed-input { flex:1; min-width:0; max-height:200rpx; font-size:28rpx; line-height:1.5; padding:8rpx; }
+.hold-button { flex:1; text-align:center; padding:16rpx 0; font-size:30rpx; user-select:none; }
+.mode-button { flex:none; width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; }
+.mode-button image { width:42rpx; height:42rpx; }
+.attach-button { border:1rpx solid #9a9a9a; border-radius:50%; box-sizing:border-box; }
+.attach-button image { width:36rpx; height:36rpx; transition:transform .18s ease; }
+.attach-button.attach-open image { transform:rotate(45deg); }
+.send-button { padding:12rpx 16rpx; background:#07c160; color:white; border-radius:16rpx; font-size:26rpx; }
+.voice-overlay { position:fixed; z-index:1000; top:0; bottom:0; left:0; right:0; background:rgba(0,0,0,.72); color:white; }
+.top-target { position:absolute; left:32rpx; right:32rpx; display:flex; align-items:center; justify-content:center; border:1rpx dashed #aaa; border-radius:24rpx; font-size:24rpx; color:#ddd; box-sizing:border-box; }
+.is-locked { border:0; }
+.finish-button { background:#fff; color:#222; font-size:30rpx; border-radius:40rpx; padding:0 48rpx; }
+.voice-center { position:absolute; top:44%; transform:translateY(-50%); left:44rpx; right:44rpx; display:flex; flex-direction:column; align-items:center; }
+.speech-bubble { position:relative; box-sizing:border-box; width:100%; min-height:150rpx; max-height:440rpx; padding:34rpx 40rpx; border-radius:32rpx; color:#182332; background:#cfe0fc; transition:width .18s,background-color .18s; }
+.speech-bubble::after { content:''; position:absolute; bottom:-17rpx; left:calc(50% - 18rpx); border-top:20rpx solid #cfe0fc; border-left:18rpx solid transparent; border-right:18rpx solid transparent; }
+.cancel-bubble { width:124rpx; min-height:112rpx; padding:30rpx 18rpx; background:#fa5753; }
+.cancel-bubble::after { border-top-color:#fa5753; }
+.live-text { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; font-size:30rpx; }
+.waves { height:34rpx; display:flex; align-items:center; justify-content:flex-end; gap:5rpx; margin-top:16rpx; }
+.cancel-bubble .waves { justify-content:center; margin:8rpx 0; }
+.wave { width:5rpx; height:24rpx; background:#326cce; border-radius:6rpx; animation:voice-wave .7s ease-in-out infinite alternate; }
+.is-cancel .wave { background:#96322e; }
+@keyframes voice-wave { from { transform:scaleY(.35); } to { transform:scaleY(1.2); } }
+.center-hint { margin-top:36rpx; color:#ccc; font-size:25rpx; }
+.review-scroll { max-height:350rpx; font-size:34rpx; white-space:pre-wrap; word-break:break-word; }
+.review-input { width:100%; max-height:350rpx; font-size:34rpx; }
+.record-bottom { position:absolute; bottom:0; left:0; right:0; text-align:center; }
+.bottom-hint { display:block; padding-bottom:40rpx; color:#ddd; font-size:28rpx; }
+.record-arc { height:180rpx; border-radius:50% 50% 0 0; padding-top:50rpx; background:#c4c6c9; border-top:8rpx solid #e1e1e3; }
+.record-arc image { width:56rpx; height:56rpx; opacity:.6; }
+.is-cancel .record-arc { background:#414141; border-top-color:#484848; }
+.review-actions { position:absolute; bottom:calc(50rpx + env(safe-area-inset-bottom)); left:0; right:0; display:flex; align-items:center; flex-direction:column; gap:70rpx; }
+.cancel-button { font-size:28rpx; color:white; background:transparent; margin:0 0 0 100rpx; align-self:flex-start; }
+.cancel-button::after,.confirm-button::after { border:0; }
+.confirm-button { width:160rpx; height:160rpx; line-height:160rpx; padding:0; border-radius:50%; background:white; color:#3478ee; font-size:70rpx; }
+.confirm-button[disabled] { opacity:.4; }
+@media (prefers-reduced-motion:reduce) { .wave { animation:none; } .speech-bubble,.attach-button image { transition:none; } }
+
+/* 微信 button 自带最小宽高；清掉默认值，确认按钮才是圆形而非椭圆。 */
+.finish-button,.cancel-button,.confirm-button { min-width:0; min-height:0; box-sizing:border-box; font-weight:400; }
+.finish-button { height:88rpx; line-height:88rpx; }
+.cancel-button { width:auto; line-height:70rpx; }
+.confirm-button { width:160rpx !important; height:160rpx !important; min-width:0 !important; min-height:0 !important; }
+
+.review-actions { height:300rpx; display:block; }
+.review-actions .cancel-button { position:absolute; left:18%; top:0; margin:0; width:130rpx; padding:0; }
+.review-actions .confirm-button { position:absolute; left:50%; bottom:0; margin:0; transform:translateX(-50%); }

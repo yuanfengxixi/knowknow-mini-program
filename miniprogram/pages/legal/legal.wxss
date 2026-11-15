@@ -1,0 +1,13 @@
+.legal {
+  padding: 36rpx 40rpx;
+}
+.md-h1 { font-size: 40rpx; font-weight: 700; margin: 16rpx 0 24rpx; }
+.md-h2 { font-size: 32rpx; font-weight: 700; margin: 32rpx 0 12rpx; padding-left: 16rpx; border-left: 6rpx solid var(--brand); }
+.md-quote { font-size: 26rpx; color: #8a8a8a; background: #f7f7f7; border-radius: 12rpx; padding: 14rpx 20rpx; margin: 8rpx 0 16rpx; }
+.md-li { display: flex; margin: 8rpx 0; font-size: 29rpx; line-height: 1.7; color: #444; }
+.md-dot { color: var(--brand); font-weight: 700; margin-right: 12rpx; flex-shrink: 0; }
+.md-li-text { flex: 1; }
+.md-p { font-size: 29rpx; line-height: 1.85; margin: 10rpx 0; color: #333; }
+.md-gap { height: 12rpx; }
+.md-b { font-weight: 700; color: #111; }
+.legal-pad { height: 60rpx; }

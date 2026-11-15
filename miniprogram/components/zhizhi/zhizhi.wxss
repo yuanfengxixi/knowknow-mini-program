@@ -1,0 +1,99 @@
+/* 知知形象动画。所有位移用百分比（相对元素自身尺寸），组件任意 size 下弹跳幅度等比缩放 */
+.zz { position: relative; }
+
+/* 跳跃载体：压扁/拉伸以脚底为轴，否则落地会"沉进地里" */
+.zz-hopper { transform-origin: 50% 100%; }
+.zz-m-bounce .zz-hopper { animation: zz-jump 1.6s infinite; }
+.zz-m-hop .zz-hopper { animation: zz-hop 0.8s infinite; }
+.zz-m-idle .zz-hopper { animation: zz-idle 2.4s ease-in-out infinite; }
+
+/* 身体画布：padding-bottom 按原图 670:508 撑高度（aspect-ratio 老基础库不支持） */
+.zz-char { position: relative; width: 100%; padding-bottom: 75.8%; }
+.zz-char image { position: absolute; }
+.zz-full, .zz-body { left: 0; top: 0; width: 100%; height: 100%; }
+.zz-glasses { left: 0; top: 0; width: 100%; height: 100%; }
+.zz-glasses-wear { animation: zz-wear-glasses 0.46s ease-out both; }
+.zz-glasses-remove { animation: zz-remove-glasses 0.46s ease-in both; }
+@keyframes zz-wear-glasses {
+  0% { opacity: 0; transform: translate(24%, -34%) scale(0.78) rotate(-16deg); }
+  72% { opacity: 1; transform: translate(-2%, 3%) scale(1.04) rotate(3deg); }
+  100% { opacity: 1; transform: translateY(0) rotate(0); }
+}
+@keyframes zz-remove-glasses {
+  0% { opacity: 1; transform: translateY(0); }
+  28% { opacity: 1; transform: translate(-2%, 3%) scale(1.04) rotate(3deg); }
+  100% { opacity: 0; transform: translate(24%, -34%) scale(0.78) rotate(-16deg); }
+}
+
+/* 眼睛位置/尺寸 = 抠图时量出的原图坐标换算的百分比，改了素材必须重新量 */
+.zz-eye { animation: zz-blink 3.2s infinite; transform-origin: 50% 62%; }
+.zz-eye-l { left: 26.12%; top: 47.84%; width: 6.72%; height: 26.77%; }
+.zz-eye-r { left: 61.79%; top: 47.44%; width: 7.46%; height: 26.18%; }
+
+/* 脚下影子：跟弹跳反向缩放，传达"离地/落地"的重量感 */
+.zz-shadow {
+  width: 72%;
+  height: 5%;
+  min-height: 8rpx;
+  margin: 2% auto 0;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+}
+.zz-m-bounce .zz-shadow { animation: zz-shadow 1.6s infinite; }
+.zz-m-hop .zz-shadow { animation: zz-hop-shadow 0.8s infinite; }
+
+/* 原地弹跳：蓄力压扁→起跳拉长→落地重压→弹簧衰减回稳 */
+@keyframes zz-jump {
+  0%   { transform: translateY(0) scale(1, 1); }
+  8%   { transform: translateY(0) scale(1.09, 0.88); animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1); }
+  16%  { transform: translateY(-4%) scale(0.93, 1.1); }
+  36%  { transform: translateY(-38%) scale(1, 1); animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.4); }
+  56%  { transform: translateY(-4%) scale(0.96, 1.06); }
+  61%  { transform: translateY(0) scale(1.18, 0.8); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  71%  { transform: translateY(0) scale(0.94, 1.06); }
+  80%  { transform: translateY(0) scale(1.05, 0.96); }
+  88%  { transform: translateY(0) scale(0.985, 1.015); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes zz-shadow {
+  0%, 8%    { transform: scale(1.08); opacity: 0.9; }
+  36%       { transform: scale(0.6); opacity: 0.35; }
+  61%       { transform: scale(1.18); opacity: 1; }
+  80%, 100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* 横跳步伐：比原地弹跳快、幅度小，空中前倾 5 度传达行进方向 */
+@keyframes zz-hop {
+  0%   { transform: translateY(0) scale(1.06, 0.9) rotate(0deg); }
+  12%  { transform: translateY(-4%) scale(0.95, 1.07) rotate(2deg); }
+  40%  { transform: translateY(-26%) scale(1, 1) rotate(5deg); animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.44); }
+  68%  { transform: translateY(-4%) scale(0.97, 1.04) rotate(2deg); }
+  76%  { transform: translateY(0) scale(1.15, 0.84) rotate(-1deg); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  88%  { transform: translateY(0) scale(0.96, 1.04) rotate(0deg); }
+  100% { transform: translateY(0) scale(1.04, 0.96) rotate(0deg); }
+}
+@keyframes zz-hop-shadow {
+  0%   { transform: scale(1.05); opacity: 0.85; }
+  40%  { transform: scale(0.68); opacity: 0.4; }
+  76%  { transform: scale(1.12); opacity: 0.95; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* 轻呼吸：头像场景用，幅度小到不抢注意力 */
+@keyframes zz-idle {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-2%) scale(1.02, 0.98); }
+}
+
+/* 眨眼：长睁短闭，模拟自然眨眼节奏 */
+@keyframes zz-blink {
+  0%, 88%   { transform: scaleY(1); }
+  92%       { transform: scaleY(0.06); }
+  96%, 100% { transform: scaleY(1); }
+}
+
+/* 系统开了"减弱动态效果"就全部静止，尊重晕动症用户 */
+@media (prefers-reduced-motion: reduce) {
+  .zz-hopper, .zz-eye, .zz-shadow, .zz-glasses { animation: none; }
+  .zz-glasses-remove { opacity: 0; }
+}

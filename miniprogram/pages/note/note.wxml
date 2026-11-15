@@ -1,0 +1,72 @@
+<loading-mask show="{{booting}}" bg="#FFFFFF"/>
+<view class="note-page" wx:if="{{note}}">
+  <input class="n-title-input" value="{{title}}" bindinput="onTitle" bindblur="saveTitle" placeholder="标题" />
+
+  <!-- 所属目录 -->
+  <view class="n-folder muted">{{note.folder === '/' ? '根目录' : '/' + note.folder}}</view>
+
+  <!-- 图片 -->
+  <image
+    wx:for="{{note.images}}"
+    wx:key="*this"
+    class="n-image"
+    src="{{item}}"
+    mode="widthFix"
+    bindtap="previewImage"
+    data-src="{{item}}"
+  ></image>
+
+  <!-- 正文阅读态：排版块渲染（标题/列表/**加粗**），点任意处进编辑态。
+       块结构与 pages/index/index.wxml 的 msg-blocks 段保持一致，解析器唯一来源是 utils/markdown.js
+       （WXML 无法跨页复用是模板机制限制，改块结构两边一起改，见 D-2026-08-23-笔记markdown排版）。
+       user-select 只对 text 组件生效，挂每个块的 text 节点上；长按选中和 tap 进编辑互不冲突 -->
+  <view wx:if="{{!editing && blocks.length}}" class="n-content-read" bindtap="startEdit">
+    <block wx:for="{{blocks}}" wx:for-item="blk" wx:key="k">
+      <view wx:if="{{blk.type === 'heading'}}" class="mb-heading"><text user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text></view>
+      <view wx:elif="{{blk.type === 'bullet'}}" class="mb-bullet"><text class="mb-marker">{{blk.ordinal ? blk.ordinal : '•'}}</text><text class="mb-bullet-text" user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text></view>
+      <text wx:else class="mb-para" user-select="{{true}}"><text wx:for="{{blk.segments}}" wx:for-item="seg" wx:key="k" class="{{seg.b ? 'mb-b' : ''}}">{{seg.t}}</text></text>
+    </block>
+  </view>
+  <!-- 编辑态（空笔记 blocks 为 [] 也落到这里，直接显示占位符）：textarea 显示原始文本，失焦保存回阅读态 -->
+  <textarea
+    wx:else
+    class="n-content-edit"
+    value="{{content}}"
+    bindinput="onContent"
+    bindblur="onContentBlur"
+    focus="{{editFocus}}"
+    cursor="{{cursorPos}}"
+    auto-height
+    placeholder="写点东西…"
+    maxlength="-1"
+    show-confirm-bar="{{false}}"
+    cursor-spacing="20"
+    adjust-position="{{true}}"
+  />
+
+  <!-- 关联笔记 -->
+  <view class="n-related" wx:if="{{related.length}}">
+    <view class="nr-title">🔗 相关笔记</view>
+    <view
+      class="nr-item"
+      wx:for="{{related}}"
+      wx:key="_id"
+      data-id="{{item._id}}"
+      bindtap="openRelated"
+    >{{item.title}}</view>
+  </view>
+
+  <!-- 去聊天 -->
+  <view class="n-chat-btn" bindtap="goChat">去聊天补充</view>
+
+  <view class="n-bottom-spacer"></view>
+</view>
+
+<!-- 底部输入栏（悬浮卡片 — 与聊天页一致） -->
+<view class="note-input-wrap" wx:if="{{note}}">
+  <voice-input value="{{inputValue}}" placeholder="继续写…" attachment="{{true}}" bindinput="onInput" bindsend="sendToChat" bindattach="addImage"/>
+</view>
+
+<view class="muted loading" wx:else>加载中…</view>
+
+<operation-toast show="{{busyText ? true : false}}" text="{{busyText}}"/>
