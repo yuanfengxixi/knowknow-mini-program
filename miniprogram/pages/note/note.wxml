@@ -3,7 +3,7 @@
   <input class="n-title-input" value="{{title}}" bindinput="onTitle" bindblur="saveTitle" placeholder="标题" />
 
   <!-- 所属目录 -->
-  <view class="n-folder muted">{{note.folder === '/' ? '根目录' : '/' + note.folder}}</view>
+  <view class="n-folder muted">{{note.folder === '/' ? '根目录' : note.folder}}</view>
 
   <!-- 图片 -->
   <image
