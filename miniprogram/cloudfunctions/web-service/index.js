@@ -12,7 +12,17 @@ const { receipt } = require('./_shared/task-queue-io.js');
 const { dispatch } = require('./_shared/task-dispatch.js');
 const { checkQuota } = require('./_shared/quota.js');
 const queue = createQueue(db);
-const ORIGIN = 'https://example.com';
+function configuredOrigin() {
+  const value = String(process.env.WEB_ALLOWED_ORIGIN || 'https://example.com').trim().replace(/\/$/, '');
+  let url;
+  try { url = new URL(value); } catch (_) { throw Error('INVALID_WEB_ORIGIN'); }
+  if (url.protocol !== 'https:' || url.origin !== value || url.username || url.password ||
+    url.pathname !== '/' || url.search || url.hash) {
+    throw Error('INVALID_WEB_ORIGIN');
+  }
+  return url.origin;
+}
+const ORIGIN = configuredOrigin();
 
 function header(headers, name) {
   const key = Object.keys(headers || {}).find((item) => item.toLowerCase() === name.toLowerCase());
@@ -26,6 +36,21 @@ function response(statusCode, body, headers = {}) {
 function redirect(url, cookie = '') {
   return { statusCode: 302, headers: { Location: url, 'Cache-Control': 'no-store',
     'Referrer-Policy': 'no-referrer', ...(cookie ? { 'Set-Cookie': cookie } : {}) }, body: '' };
+}
+function legacyPathRedirect(event) {
+  const path = String(event.path || event.rawPath || event.requestContext?.path || '');
+  const mapping = [['/guide', '/knowknow/guide'], ['/app', '/knowknow/app'], ['/legal', '/knowknow/legal']];
+  const match = mapping.find(([from]) => path === from || path.startsWith(`${from}/`));
+  if (!match) return null;
+  const suffix = path.slice(match[0].length);
+  const targetPath = `${match[1]}${suffix || '/'}`;
+  const rawQuery = typeof event.rawQueryString === 'string' ? event.rawQueryString : '';
+  const query = event.queryStringParameters || {};
+  const queryString = new URLSearchParams(rawQuery || Object.entries(query)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => [key, String(value)])).toString();
+  return { statusCode: 301, headers: { Location: `${ORIGIN}${targetPath}${queryString ? `?${queryString}` : ''}`,
+    'Cache-Control': 'public, max-age=86400', 'Referrer-Policy': 'no-referrer' }, body: '' };
 }
 function parseBody(event) {
   const raw = event.isBase64Encoded ? Buffer.from(event.body || '', 'base64').toString('utf8') : event.body;
@@ -96,13 +121,15 @@ exports.main = async (event = {}) => {
   const cookies = header(event.headers, 'cookie');
   try {
     if (method === 'GET') {
+      const oldPath = legacyPathRedirect(event);
+      if (oldPath) return oldPath;
       const query = event.queryStringParameters || {};
       try {
         const result = await auth.finishLogin(db, auth.config(), query, cookies);
-        return redirect(result.linked ? ORIGIN + '/app/' : ORIGIN + '/app/?login=unlinked', result.cookie);
+        return redirect(result.linked ? ORIGIN + '/knowknow/app/' : ORIGIN + '/knowknow/app/?login=unlinked', result.cookie);
       } catch (error) {
         console.warn('web oauth callback failed', error.message || error);
-        return redirect(ORIGIN + '/app/?login=failed');
+        return redirect(ORIGIN + '/knowknow/app/?login=failed');
       }
     }
     if (method !== 'POST') return response(405, { ok: false, code: 'METHOD_NOT_ALLOWED' });

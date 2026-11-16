@@ -23,7 +23,7 @@
 1. 将根目录 `project.config.json` 中的 `touristappid` 替换为你自己的小程序 AppID。
 2. 在 `miniprogram/app.js` 的 `globalData.cloudEnv` 填入你自己的 CloudBase 环境 ID；留空时使用开发者工具选定的当前环境。
 3. 在 CloudBase 控制台按云函数需要设置运行时环境变量。变量名称示例见 `.env.example`；不要把真实密钥写进 Git。
-4. 将 Web 登录配置中的 `example.com` 替换成你自己已验证的回调域名，并配置对应的微信网站应用信息。
+4. 在 CloudBase `web-service` 环境变量中设置 `WEB_ALLOWED_ORIGIN` 为你自己已验证的 HTTPS 网站源（例如 `https://example.com`），并配置对应的微信网站应用信息。
 5. 检查 `miniprogram/pages/legal/content.js`、会员页和账号页的占位说明，为自己的服务补充经过审查的隐私政策、用户协议、会员规则、退款说明和客服信息。
 6. 核对 `miniprogram/utils/constants.js`、会员页与云函数中的额度、价格、配额和模型默认值，再部署到自己的测试环境。
 7. 在仓库根目录运行 `node scripts/sync-cloudfunction-shared.cjs`，将共享云函数模块复制到各函数目录；随后使用微信开发者工具打开仓库并部署 `miniprogram/cloudfunctions/` 下的云函数。
@@ -35,7 +35,7 @@ GitHub Actions 会在 Node.js 20 和 22 下运行这组测试，并检查小程�
 
 ## CloudBase 云函数环境变量
 
-`.env.example` 只列运行时变量名称，不含密钥值：`DEEPSEEK_API_KEY`、`EMBEDDING_API_KEY`、`EMBEDDING_BASE_URL`、`EMBEDDING_MODEL`、`TASK_DISPATCH_SECRET`、`TASK_WORKER_NAME`、`WECHAT_WEB_APP_ID`、`WECHAT_WEB_APP_SECRET`、`ARK_API_KEY`、`ARK_IMAGE_MODEL`、`WECHAT_MINIPROGRAM_APP_SECRET`、`VIRTUAL_PAY_OFFER_ID`、`VIRTUAL_PAY_APP_KEY`、`VIRTUAL_PAY_GOODS_ID`。只为已启用的功能配置变量。CloudBase 会提供 `SCF_NAMESPACE`、`TCB_ENV`、`TENCENTCLOUD_REGION` 和临时云端凭据；部署用腾讯云 API 密钥不要放进函数环境变量。
+`.env.example` 只列运行时变量名称，不含密钥值：`DEEPSEEK_API_KEY`、`EMBEDDING_API_KEY`、`EMBEDDING_BASE_URL`、`EMBEDDING_MODEL`、`TASK_DISPATCH_SECRET`、`TASK_WORKER_NAME`、`WECHAT_WEB_APP_ID`、`WECHAT_WEB_APP_SECRET`、`WEB_ALLOWED_ORIGIN`、`ARK_API_KEY`、`ARK_IMAGE_MODEL`、`WECHAT_MINIPROGRAM_APP_SECRET`、`VIRTUAL_PAY_OFFER_ID`、`VIRTUAL_PAY_APP_KEY`、`VIRTUAL_PAY_GOODS_ID`。只为已启用的功能配置变量。CloudBase 会提供 `SCF_NAMESPACE`、`TCB_ENV`、`TENCENTCLOUD_REGION` 和临时云端凭据；部署用腾讯云 API 密钥不要放进函数环境变量。
 
 ## 许可
 
