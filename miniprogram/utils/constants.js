@@ -1,6 +1,9 @@
 // 前端常量唯一来源。云函数名、action 枚举、错误码文案等一律从这里 import，
 // 禁止在页面里写字符串字面量（防止改一处漏一处）。
 
+/** 部署者可填自己的 CloudBase 环境 ID；留空时使用开发者工具当前选择的环境。 */
+const CLOUD_ENV_ID = '';
+
 /** 云函数名 */
 const FN = {
   TASK_SERVICE: 'task-service',
@@ -96,5 +99,5 @@ const VOICE = { SEGMENT_MS: 60000, MAX_MS: 300000, CANCEL_DISTANCE: 64,
 const UX = { ANIMATION_DELAY: 1001, SCROLL_DURATION: 400, SCROLL_FRAME: 16, SCROLL_FOCUS_DELAY: 450,
   REPLY_CARD_LIMIT: 5 }; // 产品要求：回复卡片避免占满聊天，修改优先。
 
-module.exports = { VOICE, UX, TASK, FN, KB, TIMEOUT, UPLOAD_PREFIX, FILE_LIMIT,
+module.exports = { CLOUD_ENV_ID, VOICE, UX, TASK, FN, KB, TIMEOUT, UPLOAD_PREFIX, FILE_LIMIT,
   ATTACH_MENU, ATTACH_MENU_MAX_ITEMS, RECYCLE_RETAIN_DAYS, MEMBERSHIP };

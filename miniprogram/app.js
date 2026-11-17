@@ -1,8 +1,10 @@
 // say 小程序入口
+const { CLOUD_ENV_ID } = require('./utils/constants');
+
 App({
   globalData: {
-    // 云开发环境 ID（企业号生产环境）
-    cloudEnv: '',
+    // 留空时使用微信开发者工具当前选择的环境。
+    cloudEnv: CLOUD_ENV_ID,
     // 用户登录态缓存
     openid: null,
     // 是否完成首次引导
