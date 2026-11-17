@@ -21,7 +21,7 @@
 ## 本地配置
 
 1. 将根目录 `project.config.json` 中的 `touristappid` 替换为你自己的小程序 AppID。
-2. 在 `miniprogram/app.js` 的 `globalData.cloudEnv` 填入你自己的 CloudBase 环境 ID；留空时使用开发者工具选定的当前环境。
+2. 在 `miniprogram/utils/constants.js` 的 `CLOUD_ENV_ID` 填入你自己的 CloudBase 环境 ID；留空时使用开发者工具选定的当前环境。
 3. 在 CloudBase 控制台按云函数需要设置运行时环境变量。变量名称示例见 `.env.example`；不要把真实密钥写进 Git。
 4. 在 CloudBase `web-service` 环境变量中设置 `WEB_ALLOWED_ORIGIN` 为你自己已验证的 HTTPS 网站源（例如 `https://example.com`），并配置对应的微信网站应用信息。
 5. 检查 `miniprogram/pages/legal/content.js`、会员页和账号页的占位说明，为自己的服务补充经过审查的隐私政策、用户协议、会员规则、退款说明和客服信息。
